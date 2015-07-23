@@ -1,0 +1,12 @@
+<Trending>
+	<URL>http://teamadmin.gt.com/sites/ApplicationOperations/applicationsupport/</URL>
+	<List>Trending RCS Disk Space</List>
+	<Title>RCS Trending</Title>
+	<ContentStores>
+		<ContentStore>\\CDC-NAS-FS01\EntAppData\DRC\Export</ContentStore>
+		<ContentStore>\\CDC-NAS-FS01\EntAppData\DRC\Import</ContentStore>
+		<ContentStore>\\CDC-NAS-FS01\EntAppData\DRC\IRCAUploadedDocument</ContentStore>
+		<ContentStore>\\CDC-NAS-FS01\EntAppData\DRC\UploadedDocument</ContentStore>
+		<ContentStore>\\CDC-NAS-FS01\EntAppData\DRC\USUploadedDocument</ContentStore>
+	</ContentStores>
+</Trending>
