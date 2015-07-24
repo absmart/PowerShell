@@ -5,14 +5,16 @@
 
  Example XML Config:
 
-    <Trending>
-    	<URL>http://teamadmin.gt.com/sites/ApplicationOperations/applicationsupport/</URL>
-	    <List>Trending RCS Disk Space</List>
-	    <Title>RCS Trending</Title>
-	    <ContentStores>
-    		<ContentStore>\\CDC-NAS-FS01\EntAppData\DRC\UploadedDocument</ContentStore>
-	    </ContentStores>
-    </Trending>
+	<Trending>
+		<dst>http://sharepoint.domain.tld/Department/Support/</dst>
+		<output_path>D:\LogFiless\ContentGrowth</output_path>
+		<content_stores>
+			<content_store>\\nas01\share01\</content_store>
+			<content_store>\\nas01\share02</content_store>
+		</content_stores>
+		<stats_file>NAS-Stats.csv</stats_file>
+		<files_per_hour>NAS-By-Hour-Stats.csv</files_per_hour>
+	</Trending>
 
  .EXAMPLE
  

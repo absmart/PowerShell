@@ -1,0 +1,10 @@
+<Trending>
+	<dst>http://sharepoint.domain.tld/Department/Support/</dst>
+	<output_path>D:\LogFiless\ContentGrowth</output_path>
+	<content_stores>
+		<content_store>\\nas01\share01\</content_store>
+		<content_store>\\nas01\share02</content_store>
+	</content_stores>
+	<stats_file>NAS-Stats.csv</stats_file>
+	<files_per_hour>NAS-By-Hour-Stats.csv</files_per_hour>
+</Trending>

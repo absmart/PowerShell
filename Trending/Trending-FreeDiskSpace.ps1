@@ -10,7 +10,7 @@ if( (Get-PSSnapin | Where { $_.Name -eq "StoragePoint.PowershellCmdlets" }) -eq 
 . (Join-Path $ENV:SCRIPTS_HOME "Libraries\Standard_Functions.ps1")
 . (Join-Path $ENV:SCRIPTS_HOME "Libraries\SharePoint_Functions.ps1")
 
-Set-Variable -option constant -Name Url -Value "http://teamadmin.gt.com/sites/ApplicationOperations/"
+Set-Variable -option constant -Name Url -Value "http://sharepoint.domain.tld/Department/Support/"
 Set-Variable -option constant -Name List -Value "Trending"
 Set-Variable -option constant -Name Title -Value "Server"
 
