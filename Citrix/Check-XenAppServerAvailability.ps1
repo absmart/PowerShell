@@ -7,6 +7,7 @@
     $SharePointList = "Issues Tracker"
 )
 
+$XAServer = "CDC-APP-XENP00"
 Import-Module (Join-Path $env:SCRIPTS_HOME "\Libraries\Sharepoint_Functions.ps1")
 Import-Module (Join-Path $env:SCRIPTS_HOME "\Libraries\Standard_Variables.ps1")
 
@@ -20,11 +21,11 @@ $XAServerList = Invoke-Command -ComputerName $XAServer -ScriptBlock{
 	Add-PSSnapin Citrix.XenApp.Commands
 	$Results = Get-XAServer | Sort ServerName
 	return $Results
-} | Select ServerName
+} | Select ServerName | Where {$_.ServerName -ne "CDC-APP-XENP17"}
 
 $Compare = Compare-Object -ReferenceObject $ActiveServers -DifferenceObject $XAServerList
 
-if($Compare -gt 0)
+if($Compare -ne $null)
 {
     foreach($ServerName in $Compare.InputObject.ServerName)
     {
