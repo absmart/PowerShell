@@ -1,8 +1,9 @@
 ﻿param(
-    $ComputerName
+    $ComputerName,
+    [string] $ExportPath
 )
 
-Invoke-Command -ComputerName $ComputerName -ScriptBlock{
+$Results = Invoke-Command -ComputerName $ComputerName -ScriptBlock{
 
     $NetworkAdapter = Get-WmiObject Win32_NetworkAdapterConfiguration | where { -not [string]::IsNullorEmpty($_.IPAddress)  -and $_.IPEnabled -eq $true -and $_.IpAddress -ne "0.0.0.0" }
     
@@ -21,4 +22,13 @@ Invoke-Command -ComputerName $ComputerName -ScriptBlock{
     $Results = New-Object -TypeName psobject -Property $Table
 
     return $Results
-} | Export-Csv D:\IpInfo.csv -Append -NoTypeInformation
+}
+
+if($Export -ne $null)
+{
+    $Results | Export-Csv $ExportPath -Append -NoTypeInformation
+}
+else
+{
+    return $Results
+}

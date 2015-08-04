@@ -10,10 +10,10 @@ Invoke-Command $sharepoint_environment.$Environment.WEB -ArgumentList $Site {
         $Site
     )
     Import-Module WebAdministration
-
+        
     $Pool = (Get-Item "IIS:\Sites\$Site"| Select-Object applicationPool).applicationPool
     Restart-WebAppPool $Pool
 
-    $PoolState = Get-Item IIS:\Sites\$Site
+    $PoolState = Get-Item IIS:\Sites\$Site    
     return $PoolState
 }

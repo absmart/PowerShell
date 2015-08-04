@@ -1,6 +1,6 @@
 ﻿param(
     $ComputerName,
-    $Name
+    $Name = "AppPool - PartnerShipRetirementPlanVote2015"
 )
 
 Invoke-Command -ComputerName $ComputerName -ArgumentList $Name -ScriptBlock {
