@@ -5,8 +5,9 @@
 
 $dsc_environment = @{
 	"PullServer" = (New-Object -TypeName PSObject -Property @{
-		PullServerModulesPath = "\\PullServer\DscService\Modules"
-		PullServerConfigurationPath = "\\PullServer\DscService\Configuration"
+		ModulesPath = "\\PullServer\DscService\Modules"
+		ConfigurationPath = "\\PullServer\DscService\Configuration"
+        CertificatePath = "PullServer\ShareName\DscCertificateFile_Private.pfx" # Private certificate file for DSC configuration encryption.
 		})
 }
 

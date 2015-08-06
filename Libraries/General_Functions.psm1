@@ -844,3 +844,61 @@ function Get-EventLogs
     }
     return $logs
 }
+
+<#
+.SYNOPSIS
+ Displays the local or remote computer's last boot up time and current total uptime.
+.EXAMPLE
+ Get-SystemUptime -ComputerName localhost
+    csname         : OAKL-PBN4CLC
+    LastBootUpTime : 11/6/2014 8:14:49 AM
+        
+    System (localhost) has been online since :  0 days 4 hours 20 minutes 37 seconds
+#>
+function Get-SystemUptime
+{	
+	param(
+		[string] $ComputerName = "localhost"
+		)
+		# PowerShell 3.0 - Use this if you want to not query WMI.
+			#Get-CimInstance -ClassName win32_operatingsystem | select csname, lastbootuptime
+		# PowerShell 2.0
+			Get-WmiObject -ComputerName $ComputerName win32_operatingsystem | select csname, @{LABEL='LastBootUpTime';EXPRESSION={$_.ConverttoDateTime($_.lastbootuptime)}} | fl csname, lastbootuptime
+			Get-Uptime $ComputerName
+}
+<#
+.SYNOPSIS
+ Gets the installed software on a x64 host.
+.EXAMPLE
+ There are no examples yet. :(
+#>
+function Get-InstalledSoftware_x64
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string] $Computer = "localhost"
+        )
+        #Get-ItemProperty HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate | where {$_.DisplayName -like "*$softwaretitle*"} | ft -AutoSize
+        Get-ItemProperty HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate | ft -AutoSize
+}
+function Get-InstalledSoftware_multihosts
+{
+    param(
+        [String] $Computers = "localhost",
+        [String] $SoftwareTitle = "*"
+        )    
+        Invoke-Command -ComputerName $Computers -ScriptBlock {
+            $Applications = Get-ItemProperty HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*
+            $SpecificApplication = $Applications | where {$_.DisplayName -like "$SoftwareTitle"}
+            $Results = "$Applications | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate | ft autosize"
+            Write-Host "$Results"
+        }
+}
+
+function Enter-PSSessionCredSSP
+{
+    param(
+        [string] $Computer
+    )
+    Enter-PSSession -ComputerName $Computer -Authentication Credssp -Credential $env:USERDOMAIN\$env:USERNAME
+}

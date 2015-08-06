@@ -5,92 +5,31 @@
 #>
 
 # Join paths for the local SCRIPTS_HOME folder and import the PSM1, PS1 and DLLs.
-dir (Join-PATH $ENV:SCRIPTS_HOME "Libraries") -filter *.ps1 | % { Write-Host $(Get-Date) " - Sourcing " $_.FullName -foreground green ; . $_.FullName }
-dir (Join-PATH $ENV:SCRIPTS_HOME "Libraries") | Where { $_.Name -imatch "\.psm1|\.dll" } | % { Write-Host $(Get-Date) " - Import Module " $_.FullName -foreground green ; Import-Module $_.FullName }
+
+#dir (Join-PATH $ENV:SCRIPTS_HOME "Libraries") | Where { $_.Name -imatch "\.psm1|\.dll" } | % { Write-Host $(Get-Date) " - Import Module " $_.FullName -foreground green ; Import-Module $_.FullName }
+
 Import-Module (Join-Path $ENV:SCRIPTS_HOME "Citrix\Citrix_Functions.ps1")
-# Path for custom functions.
-dir (Join-PATH $ENV:USERPROFILE "\Documents\windowsPowerShell\Modules\Custom-Alex") -filter *.ps1 | % { Write-Host $(Get-Date) " - Sourcing " $_.FullName -foreground green ; . $_.FullName }
-# Commented out because this directory does not exist in the Libraries folder.
-#dir (Join-PATH $ENV:SCRIPTS_HOME "Libraries\extend") -filter *.ps1 | % { Write-Host $(Get-Date) " - Sourcing " $_.FullName -foreground green ; . $_.FullName }
-
-Write-Host $(Get-Date) " - Getting SharePoint servers stored in `$sp variable" -foreground green
-# Create new PSObjects for SharePoint servers
-$sp = New-Object PSObject -Property @{
-	Servers = (Get-SharePointServersWS -version 2007) + (Get-SharePointServersWS -version 2010) 
-}
-$sp | Add-Member -MemberType ScriptMethod -Name Filter -Value { 
-	param( 
-		[string] $farm = ".*",
-		[string] $env = ".*",
-		[string] $name = ".*"
-	)
-	
-	$this.Servers | ? { $_.Farm -imatch $farm -and $_.Environment -imatch $env -and $_.SystemName -imatch $name } | Select -Expand SystemName
-}
-$sp | Add-Member -MemberType ScriptMethod -Name CycleIIS -Value { 
-	param( 
-		[string] $farm = ".*",
-		[string] $env = ".*",
-		[string] $name = ".*"
-	)
-	
-	$computers = $this.Servers | ? { $_.Farm -imatch $farm -and $_.Environment -imatch $env -and $_.SystemName -imatch $name } | Select -Expand SystemName 
-	foreach( $computer in $computers ) {
-		Write-Host "[ $(Get-Date) ] - Cycling IIS on $computer ..."
-		iisreset $computer
-	}
-}
-
-$sp | Add-Member -MemberType ScriptMethod -Name CycleService -Value { 
-	param( 
-		[string] $farm = ".*",
-		[string] $env = ".*",
-		[string] $name = ".*",
-		[string] $service = "sptimerv4"
-	)
-	
-	$computers = $this.Servers | ? { $_.Farm -imatch $farm -and $_.Environment -imatch $env -and $_.SystemName -imatch $name } | Select -Expand SystemName 
-	foreach( $computer in $computers ) {
-		Write-Host "[ $(Get-Date) ] - Cycling $service on $computer ..."
-		sc.exe \\$computer stop $service
-		Sleep 1
-		sc.exe \\$computer start $service
-		sc.exe \\$computer query $service
-	}
-}
-
-# Create PSObjects for Applications.
-Write-Host $(Get-Date) " - Getting AppOps servers stored in `$apps variable" -foreground green
-$apps = New-Object PSObject -Property @{
-	Servers = Get-SPListViaWebService -url "http://teamadmin.gt.com/sites/ApplicationOperations/applicationsupport/" -List AppServers
-}
-$apps | Add-Member -MemberType ScriptMethod -Name Filter -Value { 
-	param( 
-		[string] $name = ".*",
-		[string] $env = ".*"
-	)
-	
-	$this.Servers | ? { $_.Environment -imatch $env -and $_.SystemName -imatch $name } | Select -Expand SystemName
-}
-
+dir (Join-PATH $ENV:POWERSHELL_HOME "\Libraries") -filter *.ps1 | % { Write-Host $(Get-Date) " - Sourcing " $_.FullName -foreground green ; . $_.FullName }
+dir (Join-PATH $ENV:POWERSHELL_HOME "\Libraries") -filter *.psm1 | % { Write-Host $(Get-Date) " - Sourcing " $_.FullName -foreground green ; . $_.FullName }
 
 $MaximumHistoryCount=1024 
-$SCRIPTS = "$HOME\scripts"
-$CODE = "$HOME\code"
 $env:EDITOR = "powershell_ise.exe"
 
 New-Alias -name gh -value Get-History 
 New-Alias -name i -value Invoke-History
 New-Alias -name ed -value $env:EDITOR
 
-if( (Test-Connection ent-nas-fs01) -and (Test-Path \\ent-nas-fs01.us.gt.com\app-ops\Installs\SharePoint2010-Utils-Scripts) )
+$Nas01 = "NasName01"
+$Nas01SharePath = "\\nasname01\share1"
+
+if( (Test-Connection $Nas01) -and (Test-Path $Nas01SharePat) )
 {
-	Write-Host $(Get-Date) " - Setting up Repo to \\ent-nas-fs01.us.gt.com\app-opsInstalls\SharePoint2010-Utils-Scripts" -foreground green
-	New-PSdrive -name Repo -psprovider FileSystem -root \\ent-nas-fs01.us.gt.com\app-ops\Installs\SharePoint2010-Utils-Scripts | Out-Null
-	Write-Host $(Get-Date) " - Setting up SharePoint  to \\ent-nas-fs01.us.gt.com\app-ops\Installs\SharePoint" -foreground green
-	New-PSdrive -name SharePoint -psprovider FileSystem -root \\ent-nas-fs01.us.gt.com\app-ops\Installs\SharePoint | Out-Null
-	Write-Host $(Get-Date) " - Setting up NAS  to \\ent-nas-fs01.us.gt.com\app-ops\" -foreground green
-	New-PSdrive -name NAS -psprovider FileSystem -root \\ent-nas-fs01.us.gt.com\app-ops | Out-Null
+	Write-Host $(Get-Date) " - Setting up Repo to $Nas01SharePath\Repo" -foreground green
+	New-PSdrive -name Repo -psprovider FileSystem -root "$Nas01SharePath\Repo" | Out-Null
+	Write-Host $(Get-Date) " - Setting up SharePoint  to $Nas01SharePath\SharePoint" -foreground green
+	New-PSdrive -name SharePoint -psprovider FileSystem -root $Nas01SharePath\SharePoint | Out-Null
+	Write-Host $(Get-Date) " - Setting up NAS  to $Nas01SharePath\NAS" -foreground green
+	New-PSdrive -name NAS -psprovider FileSystem -root "$Nas01SharePath\NAS" | Out-Null
 }
 # Resizes PowerShell window width.
 function Resize-Screen
@@ -143,26 +82,13 @@ function Add-Cloud-Modules
 }
 New-Alias -Name cloud -Value Add-Cloud-Modules
 
-function Add-QuestTools
-{
-	Write-Host $(Get-Date) " - Adding Quest Snappin" -foreground green
-	Add-PSSnapin Quest.*
-}
-New-Alias -Name Quest -Value Add-QuestTools
-
-function Add-PowerShellCommunityExtensions
-{
-	Write-Host $(Get-Date) " - Adding PowerShell Community Extensions Module" -foreground green
-	Import-Module pscx
-}
-New-Alias -Name pscx -Value Add-PowerShellCommunityExtensions
-
 function Add-SQLProviders
 {
 	Add-PSSnapin SqlServerCmdletSnapin100
 	Add-PSSnapin SqlServerProviderSnapin100
 }
 New-Alias -Name sql -Value Add-SQLProviders
+
 # Edit the local system's HOSTS file.
 function Edit-HostFile
 {
@@ -197,7 +123,7 @@ Set-Alias -Name home -Value Go-Home
 
 function Go-Code
 {
-	cd $Code\Scripts-Production
+	cd $env:POWERSHELL_HOME
 }
 Set-Alias -Name code -Value Go-Code
 
@@ -209,23 +135,29 @@ Set-Alias -Name SCR -Value Go-Scripts
 
 function Go-DSC
 {
-    cd D:\Operations\DSC
+    cd $ENV:DSC_HOME
 }
 Set-Alias -Name DSC -Value Go-DSC
 
 function Go-OneDrive
 {
-    cd "D:\Users\us46009\OneDrive - Grant Thornton LLP"
+    cd $ENV:USERPROFILE\OneDrive*
 }
 Set-Alias -Name onedrive -Value Go-OneDrive
 Set-Alias -Name od -Value Go-OneDrive
 
-remove-item alias:cd
-function cd 
+function Go-PowerShellDirectory
 {
-	param ( $location ) 
+    cd $ENV:DSC_HOME
+}
+Set-Alias -Name gpow -Value Go-PowerShellDirectory
 
-	if( $location -eq '-' ) 
+Remove-Item alias:cd
+function cd
+{
+	param ( $location )
+
+	if( $location -eq '-' )
 	{
 		pop-location
 	}
@@ -263,8 +195,8 @@ function prompt
     }
 }
 
-remove-item alias:ls
-set-alias ls Get-ChildItemColor
+Remove-Item alias:ls
+Set-Alias ls Get-ChildItemColor
  
 function Get-ChildItemColor {
     $fore = $Host.UI.RawUI.ForegroundColor
@@ -313,4 +245,3 @@ function Get-ChildItemColor {
 
 Remove-OfficeLogs
 Remove-TempFolder
-
