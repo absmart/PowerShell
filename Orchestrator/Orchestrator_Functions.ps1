@@ -1,4 +1,5 @@
-﻿<#
+﻿Import-Module (Join-Path $ENV:POWERSHELL_HOME "Orchestrator\Modules\OrchestratorServiceModule.psm1")
+<#
 .SYNOPSIS
  This function is used to remotely start Orchestrator Runbooks. The ServiceURL is hardcoded, but can be changed to any of the other runbook servers as well.
  
@@ -14,8 +15,6 @@ function Start-OrchRunbook {
         [string]$RunbookGUID,
         [String]$Parameters
     )
-
-    Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Orchestrator\Modules\OrchestratorServiceModule.psm1")
 
     $ServiceURL = $orchestrator_environment.WebServiceURL
 
@@ -39,8 +38,6 @@ function Get-OrchRunbook {
         [string]$RunbookName
         )
 
-        Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Orchestrator\Modules\OrchestratorServiceModule.psm1")
-
         $ServiceURL = $orchestrator_environment.WebServiceURL
 
         $Runbook = Get-OrchestratorRunbook -ServiceURL $ServiceURL | Where {$_.Name -match "$RunbookName"}
@@ -61,9 +58,7 @@ function Get-OrchRunbookGUID {
     param(
         [string]$RunbookName
         )
-
-        Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Orchestrator\Modules\OrchestratorServiceModule.psm1")
-
+                
         $ServiceURL = $orchestrator_environment.WebServiceURL
 
         $Runbook = Get-OrchestratorRunbook -ServiceURL $ServiceURL | Where {$_.Name -match "$RunbookName"}

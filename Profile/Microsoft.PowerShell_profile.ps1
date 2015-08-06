@@ -148,7 +148,7 @@ Set-Alias -Name od -Value Go-OneDrive
 
 function Go-PowerShellDirectory
 {
-    cd $ENV:DSC_HOME
+    cd $ENV:POWERSHELL_HOME
 }
 Set-Alias -Name gpow -Value Go-PowerShellDirectory
 

@@ -5,9 +5,9 @@ param (
     [string] $log
 )
 
-. (Join-Path $ENV:SCRIPTS_HOME "Libraries\SharePoint_Functions.ps1")
-. (Join-Path $ENV:SCRIPTS_HOME "Libraries\Standard_Functions.ps1")
-. (Join-Path $ENV:SCRIPTS_HOME "Libraries\IIS_Functions.ps1")
+. (Join-Path $ENV:POWERSHELL_HOME "Libraries\SharePoint_Functions.ps1")
+. (Join-Path $ENV:POWERSHELL_HOME "Libraries\Standard_Functions.ps1")
+. (Join-Path $ENV:POWERSHELL_HOME "Libraries\IIS_Functions.ps1")
 
 $counter = "\Web Service(_Total)\Current Connections"
 $default_site = "Default Web Site"

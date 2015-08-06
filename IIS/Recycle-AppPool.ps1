@@ -3,9 +3,9 @@
     $Environment
     )
 
-Import-Module ($env:SCRIPTS_HOME + "\Libraries\Standard_Variables.ps1")
+Import-Module ($env:POWERSHELL_HOME + "\Libraries\Standard_Variables.ps1")
 
-Invoke-Command $sharepoint_environment.$Environment.WEB -ArgumentList $Site {
+Invoke-Command $dotnetfarm.$Environment.WEB -ArgumentList $Site {
     param(
         $Site
     )
