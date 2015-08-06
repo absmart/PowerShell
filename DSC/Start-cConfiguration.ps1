@@ -1,7 +1,7 @@
 ﻿<#
 .SYNOPSIS 
  
- This script is used to perform initial configuration for an AppOps server to download and install the DSC private certificate, LCM and configure the LCM accordingly.
+ This script is used to perform initial configuration for a server to download and install the DSC private certificate, LCM and configure the LCM accordingly.
  Select the appropriate Environment and ServerType from the set of options. Updates to the script are required if additional options are required.
  StartDSCConfiguration can be toggled to True or False to immediately enable the DSC configuration by intiating the Consistency scheduled task.
 
@@ -13,13 +13,15 @@
 
  In this example DSC will be configured for an application server, and it will be assigned to the Test environment group. 
  The StartDSCConfiguration variable is True, which means the Consistency scheduled task will be run immediately after the LCM is configured.
- 
+
 #>
 param(
     [ValidateSet("Production","UAT","Development","QA","Test")] $Environment,
     [ValidateSet("CitrixServer","SharePointServer","ApplicationServer","WebServer","dotNetFarm")] $ServerType,
     [ValidateSet($True,$False)] $StartDSCConfiguration = $False
 )
+
+Import-Module (Join-Path $env:PowerShell_Home "\Libraries\General_Variables.psm1")
 
 # Prompt for the user account to download the certificate and LCM files.
 $Credentials = Get-Credential -Message "Enter your user ID:"
