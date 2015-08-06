@@ -17,20 +17,56 @@
 #>
 param(
     $PowerShellPath,
-    $DscPath    
+    $DscPath,
+    $EnableCredSSP
 )
 
 if($PowerShellPath){
-    [Environment]::SetEnvironmentVariable("POWERSHELL_HOME", $PowerShellPath, "Machine")
+    try{
+        [Environment]::SetEnvironmentVariable("POWERSHELL_HOME", $PowerShellPath, "Machine") | Out-Null
+    }
+    catch{
+        $ErrorMsg = $_.Exception.Message        Write-Host $ErrorMsg
+    }
 }
 if($DscPath){
-    [Environment]::SetEnvironmentVariable("DSC_HOME", $DscPath, "Machine")
+    try{
+        [Environment]::SetEnvironmentVariable("DSC_HOME", $DscPath, "Machine")
+    }
+    catch{
+        $ErrorMsg = $_.Exception.Message        Write-Host $ErrorMsg
+    }
+    
 }
+
 <#
 # Deprecated the SCRIPTS_HOME variable to bring the powershell_home var in line with the folder name in Github.
-if($ScriptsPath){ 
-    [Environment]::SetEnvironmentVariable("SCRIPTS_HOME", $ScriptsPath, "Machine") 
+if($ScriptsPath){
+    [Environment]::SetEnvironmentVariable("SCRIPTS_HOME", $ScriptsPath, "Machine")
 }
 #>
 
-Enable-WSManCredSSP -Role Client -DelegateComputer * -Force
+# Configure execution policy to be less strict, allow unsigned PowerShell scripts and modules to be used.
+
+$ExecutionPolicy = "Unrestricted"
+Try
+{
+    Write-Verbose "Setting the execution policy of PowerShell."
+    Set-ExecutionPolicy -ExecutionPolicy $ExecutionPolicy -Force -ErrorAction Stop
+}
+Catch
+{
+    $ErrorMsg = $_.Exception.Message    Write-Verbose $ErrorMsg
+}
+
+# Check CredSSP values and setup if not configured properly. 
+# Probably should add a DSC resource to do this, but on the back-burner right now as it requires PoSH 4.0 or newer.
+
+if($EnableCredSSP){
+
+    $CredSSP = Get-Item WSMan:\localhost\Client\Auth\CredSSP
+
+    if($CredSSP.Value -ne $true){
+        Enable-WSManCredSSP -Role Client -DelegateComputer * -Force
+    }
+}
