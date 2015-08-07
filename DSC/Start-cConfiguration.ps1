@@ -21,7 +21,11 @@ param(
     [ValidateSet($True,$False)] $StartDSCConfiguration = $False
 )
 
-Import-Module (Join-Path $env:PowerShell_Home "\Libraries\General_Variables.psm1")
+Import-Module (Join-Path $env:PowerShell_Home "\Libraries\General_Variables.psm1") # Used to source the PullServer variable.
+
+Set-Variable -Name CertPath -Value $dsc_environment.PullServer.CertificatePath
+Set-Variable -Name ModulesPath -Value $dsc_environment.PullServer.ModulesPath
+Set-Variable -Name ConfigurationPath -Value $dsc_environment.PullServer.ConfigurationPath
 
 # Prompt for the user account to download the certificate and LCM files.
 $Credentials = Get-Credential -Message "Enter your user ID:"
@@ -30,8 +34,8 @@ $Credentials = Get-Credential -Message "Enter your user ID:"
 $PfxPass = Read-Host "Enter the DSC Certificate passphrase:" -AsSecureString
 
 # Create mapped drive and copy Pfx file to C:\DSC
-Write-Host "Copying DSCCredentialCertificate_Private from \\PullServer\D$\DSC to C:\DSC\"
-New-PSDrive -Name P -PSProvider FileSystem -Root \\PullServer\d$\DSC -Credential $Credentials
+Write-Host "Copying DSCCredentialCertificate_Private from $CertPath to C:\DSC\"
+New-PSDrive -Name P -PSProvider FileSystem -Root $CertPath -Credential $Credentials
 
 $DSCPath = Test-Path C:\DSC
 if($DSCPath -eq $False)
