@@ -6,9 +6,9 @@
 
 # Join paths for the local SCRIPTS_HOME folder and import the PSM1, PS1 and DLLs.
 
-#dir (Join-PATH $ENV:SCRIPTS_HOME "Libraries") | Where { $_.Name -imatch "\.psm1|\.dll" } | % { Write-Host $(Get-Date) " - Import Module " $_.FullName -foreground green ; Import-Module $_.FullName }
+#dir (Join-PATH $env:POWERSHELL_HOME "Libraries") | Where { $_.Name -imatch "\.psm1|\.dll" } | % { Write-Host $(Get-Date) " - Import Module " $_.FullName -foreground green ; Import-Module $_.FullName }
 
-Import-Module (Join-Path $ENV:SCRIPTS_HOME "Citrix\Citrix_Functions.ps1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Citrix\Citrix_Functions.ps1")
 dir (Join-PATH $ENV:POWERSHELL_HOME "\Libraries") -filter *.ps1 | % { Write-Host $(Get-Date) " - Sourcing " $_.FullName -foreground green ; . $_.FullName }
 dir (Join-PATH $ENV:POWERSHELL_HOME "\Libraries") -filter *.psm1 | % { Write-Host $(Get-Date) " - Sourcing " $_.FullName -foreground green ; . $_.FullName }
 
@@ -58,7 +58,7 @@ function Get-Profile
 
 function Add-IISFunctions
 {
-	$lib = (Join-PATH $ENV:SCRIPTS_HOME "Libraries\IIS_Functions.ps1")
+	$lib = (Join-PATH $env:POWERSHELL_HOME "Libraries\IIS_Functions.ps1")
 	Write-Host $(Get-Date) " - Sourcing $lib"
 	. $lib
 }
@@ -123,13 +123,13 @@ Set-Alias -Name home -Value Go-Home
 
 function Go-Code
 {
-	cd $env:POWERSHELL_HOME
+	cd $env:CODE_HOME
 }
 Set-Alias -Name code -Value Go-Code
 
 function Go-Scripts
 {
-    cd $ENV:SCRIPTS_HOME
+    cd $env:POWERSHELL_HOME
 }
 Set-Alias -Name SCR -Value Go-Scripts
 

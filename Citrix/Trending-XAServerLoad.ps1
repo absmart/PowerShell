@@ -8,8 +8,8 @@
 
 #>
 
-Import-Module (Join-Path $ENV:SCRIPTS_HOME "Citrix\Citrix_Functions.ps1")
-Import-Module (Join-Path $ENV:SCRIPTS_HOME "Libraries\Standard_Variables.ps1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Citrix\Citrix_Functions.ps1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Variables.ps1")
 
 # SQL variables
 

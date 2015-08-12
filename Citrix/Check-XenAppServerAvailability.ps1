@@ -8,8 +8,8 @@
 )
 
 $XAServer = "CDC-APP-XENP00"
-Import-Module (Join-Path $env:SCRIPTS_HOME "\Libraries\Sharepoint_Functions.ps1")
-Import-Module (Join-Path $env:SCRIPTS_HOME "\Libraries\Standard_Variables.ps1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "\Libraries\Sharepoint_Functions.ps1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "\Libraries\Standard_Variables.ps1")
 
 $ActiveServers = Invoke-Command -ComputerName $XAServer -ScriptBlock{
     Add-PSSnapin Citrix.XenApp.Commands

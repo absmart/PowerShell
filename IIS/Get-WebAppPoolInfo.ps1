@@ -12,7 +12,7 @@ $sb = {
 
     #Set-Variable -Name ErrorActionPreference -Value "SilentlyContinue"
 
-    . ( Join-Path $ENV:SCRIPTS_HOME "libraries\IIS_Functions.ps1")
+    . ( Join-Path $env:POWERSHELL_HOME "libraries\IIS_Functions.ps1")
     
     if( $name -eq [string]::empty ) {
         $pools = Get-ChildItem IIS:\AppPools

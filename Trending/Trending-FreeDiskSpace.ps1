@@ -7,8 +7,8 @@ if( (Get-PSSnapin | Where { $_.Name -eq "StoragePoint.PowershellCmdlets" }) -eq 
 	Add-PSSnapIn StoragePoint.PowershellCmdlets
 }
 
-. (Join-Path $ENV:SCRIPTS_HOME "Libraries\Standard_Functions.ps1")
-. (Join-Path $ENV:SCRIPTS_HOME "Libraries\SharePoint_Functions.ps1")
+. (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Functions.ps1")
+. (Join-Path $env:POWERSHELL_HOME "Libraries\SharePoint_Functions.ps1")
 
 Set-Variable -option constant -Name Url -Value "http://sharepoint.domain.tld/Department/Support/"
 Set-Variable -option constant -Name List -Value "Trending"

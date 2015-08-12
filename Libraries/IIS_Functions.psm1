@@ -1,5 +1,6 @@
 ﻿Import-Module WebAdministration -ErrorAction Continue
-Add-PSSnapin WebFarmSnapin -ErrorAction SilentlyContinue
+try{ Add-PSSnapin WebFarmSnapin }
+    catch{ Write-Error "WebFarmSnapin failed to be added. Some functions may not work properly or as expected!" }
 
 Set-Variable -Name cert_path -Value 'cert:\LocalMachine\My'
 
@@ -70,7 +71,7 @@ function Get-IISWebState
 	)
 	
 	Invoke-Command -ComputerName $computers -ScriptBlock { 
-		. (Join-Path $ENV:SCRIPTS_HOME "Libraries\IIS_Functions.ps1")
+		. (Join-Path $env:POWERSHELL_HOME "Libraries\IIS_Functions.ps1")
 		Get-WebSite | Select Name, @{Name="State";Expression={(Get-WebSiteState $_.Name).Value}}, @{Name="Computer";Expression={$ENV:ComputerName}} 
 	} | Select Name, State, Computer
 }
@@ -80,24 +81,15 @@ function Start-IISSite
 	param(
 		[String[]] $computers,
 		[String] $site = "Default Web Site",
-		[switch] $record,
-		[switch] $sharepoint
-		
+		[switch] $record
 	)
 	
 	Get-IISWebState $computers
-	$list = "Issues Tracker"
-	if ($sharepoint){
-		$url = "http://teamadmin.gt.com/sites/ApplicationOperations/"
-	}
-	else {
-		$url = "http://teamadmin.gt.com/sites/ApplicationOperations/ApplicationSupport/"
-	}
 	Write-Host "`nStarting $site . . . `n" -ForegroundColor blue
 	
 	Invoke-Command -ComputerName $computers -ScriptBlock { 
 		param ( [string] $site )
-		. (Join-Path $ENV:SCRIPTS_HOME "Libraries\IIS_Functions.ps1")
+		. (Join-Path $env:POWERSHELL_HOME "Libraries\IIS_Functions.ps1")
 		Start-WebSite -name $site
     	$obj = New-Object PSObject -Property @{
         	Title = "Stop IIS " + $_
@@ -114,22 +106,13 @@ function Stop-IISSite
 	param(
 		[String[]] $computers,
 		[String] $site = "Default Web Site",
-		[switch] $record,
-		[switch] $sharepoint
+		[switch] $record		
 	)
 	Get-IISWebState $computers
-	$list = "Issues Tracker"
-	if ($sharepoint){
-		$url = "http://teamadmin.gt.com/sites/ApplicationOperations/"
-	}
-	else
-	{
-		$url = "http://teamadmin.gt.com/sites/ApplicationOperations/ApplicationSupport/"
-	}
 	Write-Host "`nStoping $site . . . `n" -ForegroundColor blue
 	Invoke-Command -ComputerName $computers -ScriptBlock { 
 		param ( [string] $site )
-		. (Join-Path $ENV:SCRIPTS_HOME "Libraries\IIS_Functions.ps1")
+		. (Join-Path $env:POWERSHELL_HOME "Libraries\IIS_Functions.ps1")
 		Stop-WebSite -name $site
 		$obj = New-Object PSObject -Property @{
     	    Title = "Stop IIS " + $_
@@ -172,7 +155,7 @@ function Add-DefaultDoc
 			[int] $pos = 0
 		)
 		
-		. (Join-Path $ENV:SCRIPTS_HOME "Libraries\IIS_Functions.ps1")
+		. (Join-Path $env:POWERSHELL_HOME "Libraries\IIS_Functions.ps1")
 		Add-WebConfiguration //defaultDocument/files "IIS:\sites\$site" -atIndex $pos -Value @{value=$file}
 		Get-WebConfiguration //defaultDocument/files "IIS:\sites\$site" | Select -Expand Collection | Select @{Name="File";Expression={$_.Value}}
 	} -ArgumentList $site, $file, $pos
@@ -367,7 +350,7 @@ function Get-WebDataConnectionString {
 	$connect_string = { 
 		param ( [string] $site	)
 		
-		. (Join-Path $ENV:SCRIPTS_HOME "Libraries\IIS_Functions.ps1")
+		. (Join-Path $env:POWERSHELL_HOME "Libraries\IIS_Functions.ps1")
 	
         if( !(Test-Path "IIS:\Sites\$site" ) ) {
             throw "Could not find $site"
@@ -484,7 +467,7 @@ function Install-ToGacAssembly {
 
     [System.Reflection.Assembly]::Load("System.EnterpriseServices, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a") | Out-Null
 
-    Import-Module (Join-Path $ENV:SCRIPTS_HOME "Libraries\Standard_Functions.ps1")
+    Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Functions.ps1")
 
     $gac_out_file = ".\gac_install_record.log"
 

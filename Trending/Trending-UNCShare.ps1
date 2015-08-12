@@ -35,8 +35,8 @@ param (
 
 $XML =  [xml] (Get-Content $Config)
 
-. (Join-Path $ENV:SCRIPTS_HOME "Libraries\Standard_Functions.ps1")
-. (Join-Path $ENV:SCRIPTS_HOME "Libraries\SharePoint_Functions.ps1")
+. (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Functions.ps1")
+. (Join-Path $env:POWERSHELL_HOME "Libraries\SharePoint_Functions.ps1")
 
 # SharePoint variables
 

@@ -4,10 +4,10 @@
     $SharePointList = "Citrix - Disk Space"
 )
 
-. (Join-Path $ENV:SCRIPTS_HOME "Libraries\Standard_Functions.ps1")
-. (Join-Path $ENV:SCRIPTS_HOME "Libraries\Standard_Variables.ps1")
-. (Join-Path $ENV:SCRIPTS_HOME "Libraries\SharePoint_Functions.ps1")
-. (Join-Path $ENV:SCRIPTS_HOME "Citrix\Citrix_Functions.ps1")
+. (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Functions.ps1")
+. (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Variables.ps1")
+. (Join-Path $env:POWERSHELL_HOME "Libraries\SharePoint_Functions.ps1")
+. (Join-Path $env:POWERSHELL_HOME "Citrix\Citrix_Functions.ps1")
 
 # Define variables
 

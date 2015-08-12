@@ -23,11 +23,12 @@ param (
     [string] $ServerType,
     [ParaMeter(Mandatory=$false)]
 	[string] $SharePointFarm,
-    $RunAsAccountName
+    $RunAsAccountName,
+	$DomainName
 )
 
-Import-Module (Join-Path $ENV:SCRIPTS_HOME "Libraries\Standard_Functions.ps1")
-Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Orchestrator\Modules\OrchestratorServiceModule.psm1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Functions.ps1")
+Import-Module (Join-PATH $env:POWERSHELL_HOME "Orchestrator\Modules\OrchestratorServiceModule.psm1")
 
 function Enable-PSRemoting{
     param (
@@ -77,7 +78,10 @@ foreach($Computer in $Computers){
 		Invoke-Command -ComputerName $Computer -ScriptBlock{Enable-WSManCredSSP -Role Server -Force}
         }
 
-    Invoke-Command -ComputerName $Computer -ScriptBlock {
+    Invoke-Command -ComputerName $Computer -ArgumentList $DomainName -ScriptBlock {
+		param(
+			$DomainName
+		)
         
         function Get-LocalAdmins
         {
@@ -93,7 +97,7 @@ foreach($Computer in $Computers){
                 [string] $Computer, 
                 [string] $User 
             )
-            $domain_controller = "us.gt.com"
+            $domain_controller = $DomainName
             $localGroup = [ADSI]"WinNT://localhost/Administrators,group"
             $localGroup.Add("WinNT://$domain_controller/$User,group")
         }

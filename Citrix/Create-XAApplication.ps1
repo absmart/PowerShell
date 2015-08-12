@@ -59,12 +59,12 @@ param(
         $SharePointList = "Deployment Tracker"
 )
 
-Import-Module (Join-Path $ENV:SCRIPTS_HOME "Libraries\SharePoint_Functions.ps1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\SharePoint_Functions.ps1")
 
-Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Citrix\Modules\PvsPSSnapin.dll")
-Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Citrix\Modules\Citrix.Common.Commands.Data.dll")
-Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Citrix\Modules\Citrix.Common.Commands.dll")
-Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Citrix\Modules\BrokerSnapin.dll")
+Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\PvsPSSnapin.dll")
+Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\Citrix.Common.Commands.Data.dll")
+Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\Citrix.Common.Commands.dll")
+Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\BrokerSnapin.dll")
 Set-Variable -Name script_parameters -Value $PSBoundParameters -Option Constant
 
 # Functions

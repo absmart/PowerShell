@@ -1,8 +1,8 @@
-﻿Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Citrix\Modules\PvsPSSnapin.dll")
-Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Citrix\Modules\Citrix.Common.Commands.Data.dll")
-Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Citrix\Modules\Citrix.Common.Commands.dll")
-Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Citrix\Modules\BrokerSnapin.dll")
-Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Libraries\Standard_variables.ps1")
+﻿Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\PvsPSSnapin.dll")
+Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\Citrix.Common.Commands.Data.dll")
+Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\Citrix.Common.Commands.dll")
+Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\BrokerSnapin.dll")
+Import-Module (Join-PATH $env:POWERSHELL_HOME "Libraries\Standard_variables.ps1")
 
 function Get-XAAppReport
 {

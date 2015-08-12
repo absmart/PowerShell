@@ -17,7 +17,7 @@ $WebPath = ($Drive + "Web")
 
 if($Guid -eq $null)
 {
-    Import-Module (Join-Path $env:SCRIPTS_HOME "\Libraries\Sharepoint_functions.ps1")
+    Import-Module (Join-Path $env:POWERSHELL_HOME "\Libraries\Sharepoint_functions.ps1")
         
     $Url = "http://Sharepoint.domain.com/sites/Department/Support/"
     $List = "DSC Guids"

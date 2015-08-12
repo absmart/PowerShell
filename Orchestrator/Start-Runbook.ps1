@@ -4,8 +4,8 @@ This script is designed to be used to initiate a runbook using the Orchestrator 
 The GUID values are currently configured for the runbook "Toggle XA Application".
 
 #>
-Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Libraries\Standard_Variables.ps1")
-Import-Module (Join-PATH $ENV:SCRIPTS_HOME "Orchestrator\Modules\OrchestratorServiceModule.psm1")
+Import-Module (Join-PATH $env:POWERSHELL_HOME "Libraries\Standard_Variables.ps1")
+Import-Module (Join-PATH $env:POWERSHELL_HOME "Orchestrator\Modules\OrchestratorServiceModule.psm1")
 
 # XA Server to use to enable the application
 $XAServer = "XaServer"
