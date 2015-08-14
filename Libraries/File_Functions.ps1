@@ -240,7 +240,7 @@ function Compare-DirectoriesMultiple {
 	$map = {
 		param ( [string] $directory )
 		
-		. (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Functions.ps1")
+		. (Join-Path $env:POWERSHELL_HOME "Libraries\General_Functions.psm1")
 		$files = @()
 		$system = $ENV:COMPUTERNAME
 		

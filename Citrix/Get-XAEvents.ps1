@@ -1,7 +1,9 @@
-﻿# Define variables
+﻿Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\General_Variables.psm1")
 
-$XAservers = $citrix_environment.cdc_6.XENAPP_SERVERS
-$XAservers += $citrix_environment.cdc_76.XENAPP_SERVERS
+# Define variables
+
+$XAServers = $citrix_environment.Farm01.XENAPP_SERVERS
+$XAServers += $citrix_environment.Farm02.XENAPP_SERVERS
 
 # Get event logs from list of servers
 

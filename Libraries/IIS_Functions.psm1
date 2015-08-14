@@ -94,7 +94,7 @@ function Start-IISSite
     	$obj = New-Object PSObject -Property @{
         	Title = "Stop IIS " + $_
             User = $ENV:USERNAME
-		    Description = "Stopping IIS for CMS WFE" + $_
+		    Description = "Stopping IIS for " + $_
 	    }
 	} -ArgumentList $site
 	
@@ -117,7 +117,7 @@ function Stop-IISSite
 		$obj = New-Object PSObject -Property @{
     	    Title = "Stop IIS " + $_
             User = $ENV:USERNAME
-		    Description = "Stopping IIS for CMS WFE" + $_
+		    Description = "Stopping IIS for " + $_
 	    }
 	} -ArgumentList $site
 	
@@ -155,7 +155,6 @@ function Add-DefaultDoc
 			[int] $pos = 0
 		)
 		
-		. (Join-Path $env:POWERSHELL_HOME "Libraries\IIS_Functions.ps1")
 		Add-WebConfiguration //defaultDocument/files "IIS:\sites\$site" -atIndex $pos -Value @{value=$file}
 		Get-WebConfiguration //defaultDocument/files "IIS:\sites\$site" | Select -Expand Collection | Select @{Name="File";Expression={$_.Value}}
 	} -ArgumentList $site, $file, $pos
@@ -340,7 +339,6 @@ $global:netfx = @{
 	"4.0x64" = "C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config"
 }
 
-
 function Get-WebDataConnectionString {
 	param ( 
 		[string] $computer = ".",
@@ -350,8 +348,6 @@ function Get-WebDataConnectionString {
 	$connect_string = { 
 		param ( [string] $site	)
 		
-		. (Join-Path $env:POWERSHELL_HOME "Libraries\IIS_Functions.ps1")
-	
         if( !(Test-Path "IIS:\Sites\$site" ) ) {
             throw "Could not find $site"
             return
@@ -467,8 +463,6 @@ function Install-ToGacAssembly {
 
     [System.Reflection.Assembly]::Load("System.EnterpriseServices, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a") | Out-Null
 
-    Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Functions.ps1")
-
     $gac_out_file = ".\gac_install_record.log"
 
     $publish = New-Object System.EnterpriseServices.Internal.Publish
@@ -488,4 +482,137 @@ function Install-ToGacAssembly {
 	    "{0},{1},{2},{3},{4}" -f $(Get-Date), $file.Name, $file.LastWriteTime, $file.VersionInfo.ProductVersion, $fileHash | out-file -append -encoding ascii $gac_out_file    
 	    $publish.GacInstall( $assembly )
     }
+}
+
+function Get-WebAppPoolInfo {
+    param (
+        [Parameter(Mandatory=$true)]
+	    [string[]] $computers,
+        [string] $name,
+        [switch] $details
+    )
+
+    $sb = { 
+        param(
+            [string] $name = [string]::empty
+        )
+        
+        if( $name -eq [string]::empty ) {
+            $pools = Get-ChildItem IIS:\AppPools
+        }
+        else {
+            $pools = Get-ChildItem IIS:\AppPools | where { $_.Name -eq $name } 
+        }
+
+        $app_pools = @()
+        foreach( $app_pool in $pools ) {
+            $name = $app_pool.Name
+            $state = $app_pool.State
+
+            $obj = New-Object PSObject -Property @{
+                Computer = $ENV:COMPUTERNAME
+                AppPoolName = $name
+                State =  $state
+                User = if( [string]::IsNullOrEmpty($app_pool.processModel.UserName) ) { $app_pool.processModel.identityType } else { $app_pool.processModel.UserName }
+                Version = $app_pool.ManagedRuntimeVersion
+                ProcessId = 0
+                Threads = 0
+                Handles = 0
+                MemoryInGB = 0
+                CreationDate = $(Get-Date -Date "1/1/1970")
+                Sites = [string]::join( ";" , @(Get-Website | Where { $_.ApplicationPool -eq $app_pool.Name } | Select -Expand Name) )
+                WebApplications = [string]::join( ";" , @(Get-WebApplication | 
+                                                        Where { $_.ApplicationPool -eq $app_pool.Name } | 
+                                                        Select @{N="Path";E={$_.GetParentElement().Item("Name") + $_.Path }} | 
+                                                        Select -ExpandProperty Path) 
+                                                )
+            }        
+        
+            $worker_process = $app_pool.workerProcesses.Collection | Select -First 1
+            if( $worker_process.state -eq "Running" ) {
+                $process = Get-Process -id $worker_process.processId
+               
+                $obj.ProcessId = $process.Id
+                $obj.Threads = $process.Threads.Count
+                $obj.Handles = $process.HandleCount
+                $obj.MemoryInGB = [math]::round( $process.WorkingSet64 / 1gb, 2)
+                $obj.CreationDate = $process.StartTime
+            }  
+            $app_pools += $obj
+        }
+        return $app_pools
+    }
+
+    $results = Invoke-Command -ComputerName $computers -ScriptBlock $sb -ArgumentList $name
+
+    if(!$details) { 
+        return( $results | Select Computer, AppPoolName, State, ProcessId, MemoryInGB, CreationDate )
+    }
+    else {
+        return $results | Select Computer, AppPoolName, State, ProcessId, MemoryInGB, CreationDate, User, Version, Threads, Handles, Sites, WebApplications
+    }
+}
+
+function Recycle-WebAppPool {
+    param(
+        $Site,
+        $Environment
+        )
+
+    Import-Module ($env:POWERSHELL_HOME + "\Libraries\General_Variables.psm1")
+
+    Invoke-Command $dotnetfarm.$Environment.WEB -ArgumentList $Site {
+        param(
+            $Site
+        )
+        Import-Module WebAdministration
+        
+        $Pool = (Get-Item "IIS:\Sites\$Site"| Select-Object applicationPool).applicationPool
+        Restart-WebAppPool $Pool
+
+        $PoolState = Get-Item IIS:\Sites\$Site    
+        return $PoolState
+    }
+}
+
+function Get-WebAppPoolState{
+    param(
+    $ComputerName,
+    $Name
+)
+
+Invoke-Command -ComputerName $ComputerName -ArgumentList $Name -ScriptBlock {
+    param(
+        $Name
+    )
+    Import-Module WebAdministration
+
+    try {
+        Write-Verbose "Getting WebAppPool for $Name" 
+        $WebAppPool = Get-Item -Path IIS:\AppPools\* | ? {$_.name -eq $Name} }
+    catch { $WebAppPool = $null }
+
+    if($WebAppPool -ne $null)
+    {
+        $Ensure = "Present"
+        $State  = $WebAppPool.state
+        $IdentityType = (Get-ItemProperty -Path IIS:\AppPools\$Name -Name ProcessModel).identityType
+        $Identity = (Get-ItemProperty -Path IIS:\AppPools\$Name -Name ProcessModel).userName
+    }
+    
+    if($IdentityType -eq "ApplicationPoolIdentity")
+        {$IdentityResult = "ApplicationPoolIdentity" }
+    else
+        { $IdentityResult = $Identity }
+               
+    $returnValue = @{
+        ComputerName = $env:COMPUTERNAME
+        Name   = $Name
+        Ensure = $Ensure
+        State  = $State
+        IdentityCredential = $IdentityResult
+    }
+
+    return $returnValue
+}
 }

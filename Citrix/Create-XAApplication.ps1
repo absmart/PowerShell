@@ -1,6 +1,7 @@
 ﻿<#
 .SYNOPSIS
- This function is used to create new Desktop Applications in the 7.6 Citrix farm. By default the script will 
+ This function is used to assist with creating applications in a 7.x Citrix farm in a consistent and easier method than the GUI.
+
 .EXAMPLE
  
  .\Create-XAApplication.ps1 -ApplicationName "Notepad" -DesktopGroup "XenApp Servers" -ServerName XaServer -WorkingDirectory C:\windows\system32\ -CommandLineExecutable C:\windows\system32\notepad.exe -Enabled $true -AssignedUsers "Domain\Group"
@@ -48,15 +49,13 @@ param(
         $WorkingDirectory,
         $CommandLineExecutable,
         [ValidateSet($True,$False)] $Enabled,
+
     [ParaMeter(Mandatory=$false)] 
         $AssignedUsers,
         $CommandLineArguments,
         $Description,
-        $ClientFolder,
-        $DirectorWebServiceURL = $citrix_environment.CDC_76.WebServiceURL,
-        $UserFilterEnabled = $True,
-        $SharePointUrl = "sharepoint.fqdn.tld/sites/Department/",
-        $SharePointList = "Deployment Tracker"
+        $ClientFolder,        
+        $UserFilterEnabled = $True
 )
 
 Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\SharePoint_Functions.ps1")
@@ -66,6 +65,10 @@ Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\Citrix.Common.Comm
 Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\Citrix.Common.Commands.dll")
 Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\BrokerSnapin.dll")
 Set-Variable -Name script_parameters -Value $PSBoundParameters -Option Constant
+
+$SharePointUrl = $deployment_tracking.DeploymentTracker.Url
+$SharePointList = $deployment_tracking.DeploymentTracker.List
+$DirectorWebServiceURL = $citrix_environment.Farm02.WebServiceURL
 
 # Functions
 
@@ -127,14 +130,14 @@ Set-Variable -Name script_name -Value $MyInvocation.MyCommand.Name
 $script_params = Get-ScriptParameters
 
 $deploy = New-Object PSObject -Property @{
-    Title = ("Citrix 7.6 Farm Application Created - $ApplicationName")
+    Title = ("Citrix 7.x Farm Application Created - $ApplicationName")
     DeploymentType = "Full"
     DeploymentSteps = ("Automated with {2} script from computer {1}. Application created is called '{0}'." -f $ApplicationName, $ENV:COMPUTERNAME, $script_name )
     Notes = ("Script Parameters: $script_params")
 }
 
-$environment_property = "Prod_x0020_Deployment"
-$deployer_property =  "Prod_x0020_Deployer"
+$environment_property = "Prod_x0020_Deployment" # This value will be different based on your environment.
+$deployer_property =  "Prod_x0020_Deployer" # This value will be different based on your environment.
 
 $deploy | Add-Member -MemberType NoteProperty -Name $environment_property -Value $(Get-Date).ToString("yyyy-MM-ddThh:mm:ssZ")
 $deploy | Add-Member -MemberType NoteProperty -Name $deployer_property -Value (Get-SPUserViaWS -url $SharePointUrl -name ($ENV:USERDOMAIN + "\" + $ENV:USERNAME))

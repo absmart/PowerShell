@@ -1,18 +1,14 @@
-﻿param(
-    $XAServer = "XaServerName",
-    $SharePointUrl = "sharepoint.fqdn.tld/sites/Department/",
-    $SharePointList = "Citrix - Windows Event Logs"
-)
-
-. (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Functions.ps1")
-. (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Variables.ps1")
-. (Join-Path $env:POWERSHELL_HOME "Libraries\SharePoint_Functions.ps1")
-. (Join-Path $env:POWERSHELL_HOME "Citrix\Citrix_Functions.ps1")
+﻿Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\General_Functions.psm1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\General_Variables.psm1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\SharePoint_Functions.ps1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Citrix\Citrix_Functions.ps1")
 
 # Define variables
 
-$XAservers = $citrix_environment.cdc_6.XENAPP_SERVERS
-$XAservers += $citrix_environment.cdc_76.XENAPP_SERVERS
+$SharePointUrl = $citrix_environment.Logging.SharePointUrl
+$SharePointList = $citrix_environment.Logging.SharePointEventLogList
+$XAservers = $citrix_environment.Farm01.XENAPP_SERVERS
+$XAservers += $citrix_environment.Farm02.XENAPP_SERVERS
 
 # Get event logs from list of servers
 

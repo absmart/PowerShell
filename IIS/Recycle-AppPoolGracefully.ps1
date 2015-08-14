@@ -6,7 +6,7 @@ param (
 )
 
 . (Join-Path $ENV:POWERSHELL_HOME "Libraries\SharePoint_Functions.ps1")
-. (Join-Path $ENV:POWERSHELL_HOME "Libraries\Standard_Functions.ps1")
+. (Join-Path $ENV:POWERSHELL_HOME "Libraries\General_Functions.psm1")
 . (Join-Path $ENV:POWERSHELL_HOME "Libraries\IIS_Functions.ps1")
 
 $counter = "\Web Service(_Total)\Current Connections"

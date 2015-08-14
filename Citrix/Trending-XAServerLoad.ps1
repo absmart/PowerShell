@@ -1,21 +1,18 @@
 ﻿<#
 .SYNOPSIS 
- This script is used to trend Citrix XenApp server load in the 6.0 farm in the CDC.
- 
- Results:
-
- This script uploads data directly to the SQL database CitrixLogging on CDC-SPB-P01. SharePoint uses this external content source to list the data on the Citrix Dashboard.
-
+ This script was developed to provide a way to schedule a job (in this example every 5min) to get the server load values as calculated by the XenApp platform.
+ These logs were used to understand and better provide information on the frequency and usage on multiple systems in 6.x and 7.x farms.
+  
 #>
 
 Import-Module (Join-Path $env:POWERSHELL_HOME "Citrix\Citrix_Functions.ps1")
-Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Variables.ps1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\General_Variables.psm1")
 
 # SQL variables
 
-$SQLServer = "SqlServerName"
-$Database = "CitrixLogging"
-$TableName = "ServerLoad"
+$SQLServer = $citrix_environment.Logging.SQLServer
+$Database = $citrix_environment.Logging.Database
+$TableName = $citrix_environment.Logging.SessionProcesses
 
 $ConnectionString = "Server=$SQLServer;Database=$Database;Integrated Security=True"
 

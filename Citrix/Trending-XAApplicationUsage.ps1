@@ -1,27 +1,25 @@
 ﻿<#
 .SYNOPSIS 
- This script is used to trend Citrix XenApp application usage in the 6.0 and 7.6 Citrix farms in the CDC.
  
- Results:
-
- This script uploads data directly to the SQL database CitrixLogging on CDC-SPB-P01. SharePoint uses this external content source to list the data on the Citrix Dashboard.
-
+ This script was developed to provide a way to schedule a job (in this example every 5min) to get a list of processes and log their utilization to a SQL database.
+ These logs were used to understand and better provide information on the frequency and usage on multiple applications in both 6.0 and 7.6 XenApp farms.
+ However, this could script could be used to get utilization on any kind of process as long as remote PowerShell is enabled and the executing accoutn has rights to the remote host.
+  
 #>
 
-$Domain = "fqdn.tld"
+Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\General_Variables.psm1")
 
-Import-Module (Join-Path $env:POWERSHELL_HOME "Citrix\Citrix_Functions.ps1")
-Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Variables.ps1")
+$SQLServer = $citrix_environment.Logging.SQLServer
+$Database = $citrix_environment.Logging.Database
+$TableName = $citrix_environment.Logging.SessionProcesses
 
-$SQLServer = "SqlServer"
-$Database = "CitrixLogging"
-$TableName = "SessionProcesses"
+$Domain = $domain_information.Domain01.DomainName
 
 $ConnectionString = "Server=$SQLServer;Database=$Database;Integrated Security=True"
 
 $XAServers = $null
-$XAServers = $citrix_environment.CDC_6.XENAPP_SERVERS
-$XAServers += $citrix_environment.CDC_76.XENAPP_SERVERS
+$XAServers = $citrix_environment.Farm01.XENAPP_SERVERS
+$XAServers += $citrix_environment.Farm02.XENAPP_SERVERS
 
 $Processes = Invoke-Command -ComputerName $XAServers -ScriptBlock{
 

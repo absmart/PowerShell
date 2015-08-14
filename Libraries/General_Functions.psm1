@@ -139,7 +139,7 @@ function Enable-InternetExplorerESC
     Write-Host "IE Enhanced Security Configuration (ESC) has been enabled." -ForegroundColor Green
 }
 
-function New-Guid{
+function New-Guid {
 	[guid]::NewGuid()
 }
 
@@ -151,8 +151,7 @@ function Disable-UserAccessControl
 
 function Add-GacItem([string] $path) 
 {
-	d:\utils\gacutil.exe /i $path
-    	
+	D:\utils\gacutil.exe /i $path
 }
 
 function Get-Url 
@@ -411,7 +410,6 @@ function Pause
 	$null = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
-
 function Get-PreviousMonthRange
 {
 	$Object = New-Object PSObject -Property @{            
@@ -448,10 +446,11 @@ function Gen-Passwords
 }
 
 
-$AutoUpdateNotificationLevels= @{0="Not configured"; 1="Disabled" ; 2="Notify before download"; 3="Notify before installation"; 4="Scheduled installation"}
-$AutoUpdateDays=@{0="Every Day"; 1="Every Sunday"; 2="Every Monday"; 3="Every Tuesday"; 4="Every Wednesday";5="Every Thursday"; 6="Every Friday"; 7="EverySaturday"}
+
 function Get-WindowsUpdateConfig
 {
+    $AutoUpdateNotificationLevels= @{0="Not configured"; 1="Disabled" ; 2="Notify before download"; 3="Notify before installation"; 4="Scheduled installation"}
+    $AutoUpdateDays=@{0="Every Day"; 1="Every Sunday"; 2="Every Monday"; 3="Every Tuesday"; 4="Every Wednesday";5="Every Thursday"; 6="Every Friday"; 7="EverySaturday"}
 
 	$AUSettings = (New-Object -com "Microsoft.Update.AutoUpdate").Settings
 	$AUObj = New-Object -TypeName System.Object
@@ -776,29 +775,6 @@ function BulkWrite-ToSQLDatabase([Object] $table)
     $bulkCopy.WriteToServer($table)		
 }
 
-
-function Add-UsersToServer {
-    param
-    (
-        [String[]] $servers = $(throw ' You must input at least one server'),
-        [string] $username = $(throw ' You must enter a username to check for')
-    )
-
-    $creds = Get-Credential -Credential $username
-    $user = $creds.UserName.Split("\")[1]
-    
-    foreach ( $server in $servers) {
-        if( -not ( Get-LocalAdmins -Computer $server | ? { $_ -imatch $user } ) ) {
-			Write-Host "Adding $user to " $_
-			Add-LocalAdmin -Computer $_ -Group $user
-		}
-        else {
-            Write-Host "$user already exists"
-		}
-    }
-
-}
-
 function New-EventLog 
 {
     New-Object PSObject -Property @{
@@ -809,7 +785,6 @@ function New-EventLog
 	    Server = ''
     }
 }
-
 
 function Get-EventLogs
 {
@@ -850,7 +825,7 @@ function Get-EventLogs
  Displays the local or remote computer's last boot up time and current total uptime.
 .EXAMPLE
  Get-SystemUptime -ComputerName localhost
-    csname         : OAKL-PBN4CLC
+    csname         : HOSTNAME
     LastBootUpTime : 11/6/2014 8:14:49 AM
         
     System (localhost) has been online since :  0 days 4 hours 20 minutes 37 seconds
@@ -866,21 +841,16 @@ function Get-SystemUptime
 			Get-WmiObject -ComputerName $ComputerName win32_operatingsystem | select csname, @{LABEL='LastBootUpTime';EXPRESSION={$_.ConverttoDateTime($_.lastbootuptime)}} | fl csname, lastbootuptime
 			Get-Uptime $ComputerName
 }
-<#
-.SYNOPSIS
- Gets the installed software on a x64 host.
-.EXAMPLE
- There are no examples yet. :(
-#>
+
 function Get-InstalledSoftware_x64
 {
     param(
         [Parameter(Mandatory=$true)]
         [string] $Computer = "localhost"
         )
-        #Get-ItemProperty HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate | where {$_.DisplayName -like "*$softwaretitle*"} | ft -AutoSize
         Get-ItemProperty HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate | ft -AutoSize
 }
+
 function Get-InstalledSoftware_multihosts
 {
     param(
@@ -890,8 +860,8 @@ function Get-InstalledSoftware_multihosts
         Invoke-Command -ComputerName $Computers -ScriptBlock {
             $Applications = Get-ItemProperty HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*
             $SpecificApplication = $Applications | where {$_.DisplayName -like "$SoftwareTitle"}
-            $Results = "$Applications | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate | ft autosize"
-            Write-Host "$Results"
+            $Results = $Applications | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate
+            return $Results | ft
         }
 }
 

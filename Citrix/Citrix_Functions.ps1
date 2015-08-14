@@ -2,14 +2,14 @@
 Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\Citrix.Common.Commands.Data.dll")
 Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\Citrix.Common.Commands.dll")
 Import-Module (Join-PATH $env:POWERSHELL_HOME "Citrix\Modules\BrokerSnapin.dll")
-Import-Module (Join-PATH $env:POWERSHELL_HOME "Libraries\Standard_variables.ps1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\General_Variables.psm1")
 
 function Get-XAAppReport
 {
 	param(
 		[string] $AppName,
         [ValidateSet("Equals","Matches")] [string] $Match,
-		[string] $DataCollector = "XaServerName"
+		[string] $DataCollector = $citrix_environment.Farm01.DATA_COLLECTOR
 	)
 	Invoke-Command -ComputerName $DataCollector -ArgumentList $AppName, $Match -Scriptblock{
 		param(
@@ -30,7 +30,7 @@ function Get-XAAppReport
 function Get-XAServers
 {
     param(
-        [string] $ComputerName = "XaServerName"
+        [string] $ComputerName = $citrix_environment.Farm01.DATA_COLLECTOR
     )
     $Servers = Invoke-Command -ComputerName $ComputerName -ScriptBlock {
         Add-PSSnapin Citrix.XenApp.Commands
@@ -47,12 +47,12 @@ function Get-XAServerLoadByEnv
 	switch ($CitrixEnvironment)
 	{
 		"7.6" {
-            $ServerLoad = Get-BrokerMachine -AdminAddress $citrix_environment.CDC_76.WEBSERVICEURL -DeliveryType AppsOnly -Property 'DNSName','LoadIndex','SessionCount'
+            $ServerLoad = Get-BrokerMachine -AdminAddress $citrix_environment.Farm02.WEBSERVICEURL -DeliveryType AppsOnly -Property 'DNSName','LoadIndex','SessionCount'
             return $ServerLoad | Select @{Name="XAServer";Expression={$_.DNSName.TrimEnd("domain.com")}},@{Name="Date";Expression={Get-Date}},@{Name="ServerLoad";Expression={($_.LoadIndex)}},@{Name="ServerLoadPercent";Expression={($_.LoadIndex/10000)*100}} | Sort-Object XAServer
         }
 	
         "6.0" {
-			[string] $XAServer = "XaServerName"
+			[string] $XAServer = $citrix_environment.Farm01.DATA_COLLECTOR
 			Invoke-Command -ComputerName $XAServer -ScriptBlock{
 				Add-PSSnapin Citrix.XenApp.Commands
 				$Results = Get-XAServerLoad | Select @{Name="XAServer";Expression={$_.ServerName}},@{Name="Date";Expression={Get-Date}},@{Name="ServerLoad";Expression={$_.Load}},@{Name="ServerLoadPercent";Expression={($_.Load/10000)*100}} | Sort-Object XAServer
@@ -77,7 +77,7 @@ function Get-XAServerDiskSpace
 function Get-XASessionCount
 {
     param(
-        [string] $ComputerName = "XaServerName"
+        [string] $ComputerName = $citrix_environment.Farm01.DATA_COLLECTOR
     )
 
     Invoke-Command -ComputerName $ComputerName -ScriptBlock{
@@ -91,7 +91,7 @@ function Get-XAApplicationUsage
 {
     param(
         [string] $ProcessName,
-        [string] $XAServer = "XaServerName"
+        [string] $XAServer = $citrix_environment.Farm01.DATA_COLLECTOR
     )
 
     Invoke-Command -ComputerName $XAServer -ArgumentList $ProcessName -ScriptBlock {
@@ -116,7 +116,7 @@ function Get-XAApplicationUsage
 function Get-XAAssignedUsersForApplication
 {
     param(
-        [string] $ComputerName = "XaServerName",
+        [string] $ComputerName = $citrix_environment.Farm01.DATA_COLLECTOR,
         [string] $Application
     )
 	

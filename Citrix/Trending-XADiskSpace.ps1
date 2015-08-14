@@ -1,19 +1,15 @@
-﻿param(
-    $XAServer = "XaServerName",
-    $SharePointUrl = "sharepoint.fqdn.tld/sites/Department/",
-    $SharePointList = "Citrix - Disk Space"
-)
-
-. (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Functions.ps1")
-. (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Variables.ps1")
-. (Join-Path $env:POWERSHELL_HOME "Libraries\SharePoint_Functions.ps1")
-. (Join-Path $env:POWERSHELL_HOME "Citrix\Citrix_Functions.ps1")
+﻿Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\General_Functions.psm1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\General_Variables.psm1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\SharePoint_Functions.ps1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Citrix\Citrix_Functions.ps1")
 
 # Define variables
 
 $Date = Get-Date -Format g
-$XAServers += $citrix_environment.CDC_6.XENAPP_SERVERS
-$XAServers += $citrix_environment.CDC_76.XENAPP_SERVERS
+$SharePointUrl = $citrix_environment.Logging.SharePointUrl
+$SharePointList = $citrix_environment.Logging.SharePointEventLogList
+$XAservers = $citrix_environment.Farm01.XENAPP_SERVERS
+$XAservers += $citrix_environment.Farm02.XENAPP_SERVERS
 
 # Get disk space for all XenApp servers
 
@@ -48,5 +44,5 @@ foreach($Result in $Results)
 
     # Upload information to SPList
     
-    WriteTo-SPListViaWebService -url $url -list $list -Item (Convert-ObjectToHash $Items) -title $Title
+    WriteTo-SPListViaWebService -url $SharePointUrl -list $SharePointList -Item (Convert-ObjectToHash $Items) -Title $Hash.Title
 }

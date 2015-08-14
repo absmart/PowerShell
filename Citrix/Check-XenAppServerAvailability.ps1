@@ -1,15 +1,15 @@
 ﻿param(
-    $XAServer = "XaServerName",
     $SmtpTo,
     $SmtpFrom,
-    $SmtpServer,
-    $SharePointUrl = "sharepoint.fqdn.tld/sites/Department/",
-    $SharePointList = "Issues Tracker"
+    $SmtpServer
 )
 
-$XAServer = "CDC-APP-XENP00"
+$XAServer = $citrix_environment.Farm01.DATA_COLLECTOR
 Import-Module (Join-Path $env:POWERSHELL_HOME "\Libraries\Sharepoint_Functions.ps1")
-Import-Module (Join-Path $env:POWERSHELL_HOME "\Libraries\Standard_Variables.ps1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "\Libraries\General_Variables.psm1")
+
+$SharePointUrl = $deployment_tracking.DeploymentTracker.Url
+$SharePointList = $deployment_tracking.DeploymentTracker.List
 
 $ActiveServers = Invoke-Command -ComputerName $XAServer -ScriptBlock{
     Add-PSSnapin Citrix.XenApp.Commands

@@ -1,9 +1,9 @@
 ﻿
 <#
 .SYNOPSIS 
- This script is used to setup newly provisioned servers or those that are mis-aligned with the AppOps standards expected.
+ This script was used to start a System Center Orchestrator runbook and also perform some first-run tasks to setup a new server.
  
- If the UploadAuditResults variable is set to True, the remote system's details will be logged to the Servers list on the AppOps team site.
+ If the UploadAuditResults variable is set to True, the remote system's details will be logged to the Servers list on the SharePoinUrl team site.
 
  .EXAMPLE
  
@@ -18,16 +18,16 @@ param (
     $Computers,
     [ValidateSet("True","False")][string] $RestartAllowed,
     [ValidateSet("True","False")][string] $UploadAuditResults,
-    [string] $Environment,
-    [string] $Datacenter,
-    [string] $ServerType,
+    [ValidateSet("Production","Test","QA","Development")][string] $Environment, #  Only used for recording the server inforamation to SharePoint.
+    [ValidateSet("Datacenter","Azure","AWS")][string] $Datacenter, #  Only used for recording the server inforamation to SharePoint.
+    [ValidateSet("AppServer","WebServer","SQLServer")][string] $ServerType, #  Only used for recording the server inforamation to SharePoint.
     [ParaMeter(Mandatory=$false)]
-	[string] $SharePointFarm,
+	[string] $SharePointFarm, #  Only used for recording the server inforamation to SharePoint.
     $RunAsAccountName,
 	$DomainName
 )
 
-Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\Standard_Functions.ps1")
+Import-Module (Join-Path $env:POWERSHELL_HOME "Libraries\General_Functions.psm1")
 Import-Module (Join-PATH $env:POWERSHELL_HOME "Orchestrator\Modules\OrchestratorServiceModule.psm1")
 
 function Enable-PSRemoting{
@@ -135,7 +135,7 @@ foreach($Computer in $Computers){
     # Install-ServerStandards GUID
 
     $rbGUID = "1144bdbb-daac-469d-988f-4ba119718553" # Install-ServerStandards Runbook GUID
-    $ServiceURL = "http://runbooks.domaincom:81/Orchestrator2012/Orchestrator.svc/" # Orchestrator web service URL
+    $ServiceURL = $orchestrator_environment.WebServiceUrl # Orchestrator web service URL
 
     [hashtable] $rbParameters = @{
 
@@ -157,6 +157,4 @@ foreach($Computer in $Computers){
     # Start the runbook with the table of parameters
 
     Start-OrchestratorRunbook -Runbook $Runbook -Parameters $rbParameters
-
-	Write-Host "The Server Setup runbook has been started for $Computer. Once completed, remember to setup DSC on the node with Start-GTConfiguration.ps1 script!" -ForegroundColor Green
 }
