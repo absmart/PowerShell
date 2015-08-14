@@ -70,3 +70,6 @@ if($EnableCredSSP){
         Enable-WSManCredSSP -Role Client -DelegateComputer * -Force
     }
 }
+
+# Install modules
+Copy-Item -Path $env:POWERSHELL_HOME\Profile\Modules\* -Destination $env:USERPROFILE\Documents\windowsPowerShell\Modules -Recurse -Container

@@ -7,16 +7,17 @@ Import-Module xDSCResourceDesigner
 
 # Create new DSC Resource and properties
 
-$ResourceName = "cPowerShell"
+$ResourceName = "cSSL"
+$ModuleName = "cSSL"
 
-$AllowRemoteShellAccess = New-xDscResourceProperty -Name AllowRemoteShellAccess -Type String -Attribute Key -ValidateSet "true","false" -Description "Enables access to remote shells. If you set this parameter to False, new remote shell connections will be rejected by the server. The default is True."
-$IdleTimeout = New-xDscResourceProperty -Name IdleTimeout -Type String -Attribute Write -Description "Specifies the maximum time, in milliseconds, that the remote shell will remain open when there is no user activity in the remote shell. The remote shell is automatically deleted after the time that is specified. You can specify any values from 0 through 2147483647. A value of 0 indicates an infinite time-out. The default is 900000 (15 minutes)."
-$MaxConcurrentUsers = New-xDscResourceProperty -Name MaxConcurrentUsers -Type String -Attribute Write -Description "Specifies the maximum number of users who can concurrently perform remote operations on the same computer through a remote shell. New shell connections will be rejected if they exceed the specified limit. You can specify any value from 1 through 100."
-$MaxProcessesPerShell = New-xDscResourceProperty -Name MaxProcessesPerShell -Type String -Attribute Write -Description "Specifies the maximum number of processes that any shell operation is allowed to start. You can specify any number from 0 through 2147483647. A value of 0 allows for an unlimited number of processes. By default, the limit is five processes per shell."
-$MaxMemoryPerShellMB = New-xDscResourceProperty -Name MaxMemoryPerShellMB -Type String -Attribute Write -Description "Specifies the maximum total amount of memory that can be allocated by an active remote shell and all its child processes. You can specify any value from 0 through 2147483647. A value of 0 means that the ability of the remote operations to allocate memory is limited only by the available virtual memory. The default value is 0."
-$MaxShellsPerUser = New-xDscResourceProperty -Name MaxShellsPerUser -Type String -Attribute Write -Description "Specifies the maximum number of concurrent shells that any user can remotely open on the same system. If this policy setting is enabled, the user will not be able to open new remote shells if the count exceeds the specified limit. If this policy setting is disabled or is not configured, by default, the limit will be set to two remote shells per user. You can specify any number from 0 through 2147483647. A value of 0 allows for an unlimited number of shells."
+$Ensure = New-xDscResourceProperty -Name Ensure -Type String -Attribute Write -ValidateSet "Present","Absent"
+$SslCertName = New-xDscResourceProperty -Name Name -Type String -Attribute Key -Description "The name of the certificate as listed in the Cert store."
+$PfxPassword = New-xDscResourceProperty -Name Password -Type PSCredential[] -Attribute Write -Description "Password for the Certificate."
+$CertificatePath = New-xDscResourceProperty -Name Path -Type String -Attribute Write -Description "The path used to import the certificate."
+$CertificateSubject = New-xDscResourceProperty -Name Subject -Type String -Attribute Write -Description "The subject name of the certificate."
+$CertificateStore = New-xDscResourceProperty -Name Store -Type String -Attribute Write -Description "The location of the certificate store."
 
-New-xDSCResource -Name $ResourceName -Property $AllowRemoteShellAccess,$IdleTimeout,$MaxConcurrentUsers,$MaxProcessesPerShell,$MaxMemoryPerShellMB,$MaxShellsPerUser -ModuleName $ModuleName -ClassVersion 1.0 -FriendlyName $ResourceName -Force -Path .\$ResourceName
+New-xDSCResource -Name $ResourceName -Property $SslCertName,$Ensure,$PfxPassword,$CertificatePath,$CertificateSubject,$CertificateStore -ModuleName $ModuleName -ClassVersion 1.0 -FriendlyName $ResourceName -Force
 
 <#
 $TaskName = New-xDscResourceProperty -Name TaskName -Type String -Attribute Key
