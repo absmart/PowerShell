@@ -1,4 +1,4 @@
-﻿$PullServer = "ServerNameHere"
+﻿$PullServer = "ServerNameHere" # Better to store this value in the Standard_Variables.psm1 module in the Libraries folder!
 
 function Add-DscEnvVariable {
 	param
