@@ -1,9 +1,4 @@
-﻿<#
-    **
-    THIS CONFIGURATION IS STILL IN DEVELOPMENT. DO NOT RUN THIS ON PRODUCTION SYSTEMS!
-    **
-#>
-param(
+﻿param(
     [ValidateSet("Production","UAT","Development","QA","Test")] $Environment,
     [ValidateSet("CitrixServer","SharePointServer","ApplicationServer","WebServer","dotNetFarm")] $ServerType,
     $OutPath = $null,
@@ -130,7 +125,7 @@ configuration cConfiguration
             cWebGlobalConfig AspDiskTemplateCacheDirectory { Setting = "AspDiskTemplateCacheDirectory"; Value = "$IisPath\temp\ASP Compiled Templates"}
             cWebGlobalConfig IisCompressedFilesDirectory { Setting = "IisCompressedFilesDirectory"; Value = "$IisPath\temp\IIS Temporary Compressed Files"}
             cWebGlobalConfig LocalTimeRollover { Setting = "LocalTimeRollover"; Value = "True"}
-                        
+
             File InetpubCopy
             {
                 Ensure = "Present"

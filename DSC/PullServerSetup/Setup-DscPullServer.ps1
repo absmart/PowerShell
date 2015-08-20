@@ -1,4 +1,9 @@
-﻿# Variables - Change these to your preferences.
+﻿# Copy resources to pull server. Adjust this to the path to the Resources directory that is appropriate.
+
+Copy-Item $env:POWERSHELL_HOME\DSC\Resources
+
+
+# Variables - Change these to your preferences.
 
 $DnsName = "Dsc Credential Certificate"
 $PfxPassword = ConvertTo-SecureString -String "SUPERCOMPLEXEPASSWORDHERE" -Force -AsPlainText
