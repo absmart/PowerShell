@@ -7,18 +7,22 @@ Import-Module xDSCResourceDesigner
 
 # Create new DSC Resource and properties
 
-$ResourceName = "cSSL"
-$ModuleName = "cSSL"
+$ResourceName = "cRDP"
+$ModuleName = "cRDP"
 
-$Ensure = New-xDscResourceProperty -Name Ensure -Type String -Attribute Write -ValidateSet "Present","Absent"
-$SslCertName = New-xDscResourceProperty -Name Name -Type String -Attribute Key -Description "The name of the certificate as listed in the Cert store."
-$PfxPassword = New-xDscResourceProperty -Name Password -Type PSCredential[] -Attribute Write -Description "Password for the Certificate."
-$CertificatePath = New-xDscResourceProperty -Name Path -Type String -Attribute Write -Description "The path used to import the certificate."
+#$Ensure = New-xDscResourceProperty -Name Ensure -Type String -Attribute Write -ValidateSet "Present","Absent"
+$AcceptRdpConnection = New-xDscResourceProperty -Name AcceptRdpConnection -Type Boolean -Attribute Key
+$EnforceNLAuth = New-xDscResourceProperty -Name EnforceNLAuth -Type Boolean -Attribute Write
+$AddFirewallRule = New-xDscResourceProperty -Name AddFirewallRule -Type Boolean -Attribute Write
+
+$BindingHostName = New-xDscResourceProperty -Name BindingHostName -Type String -Attribute Write -Description "The binding to assign the website."
+$Website = New-xDscResourceProperty -Name WebSite -Type String -Attribute Write -Description "The website to assign the binding to."
+$Port = New-xDscResourceProperty -Name Port -Type Uint64 -Attribute Write -Description "The port used for the binding. Default is 443."
 $CertificateSubject = New-xDscResourceProperty -Name Subject -Type String -Attribute Write -Description "The subject name of the certificate."
 $CertificateStore = New-xDscResourceProperty -Name Store -Type String -Attribute Write -Description "The location of the certificate store."
 
-New-xDSCResource -Name $ResourceName -Property $SslCertName,$Ensure,$PfxPassword,$CertificatePath,$CertificateSubject,$CertificateStore -ModuleName $ModuleName -ClassVersion 1.0 -FriendlyName $ResourceName -Force
-
+#New-xDSCResource -Name $ResourceName -Property $SslCertName,$Ensure,$SslCertThumbprint,$BindingHostName,$Website,$Port,$CertificateSubject,$CertificateStore -ModuleName $ModuleName -ClassVersion 1.0 -FriendlyName $ResourceName -Force
+New-xDscResource -Name $ResourceName -Property $AcceptRdpConnection,$EnforceNLAuth,$AddFirewallRule  -ModuleName $ModuleName -ClassVersion 1.0 -FriendlyName $ResourceName -Force
 <#
 $TaskName = New-xDscResourceProperty -Name TaskName -Type String -Attribute Key
 
