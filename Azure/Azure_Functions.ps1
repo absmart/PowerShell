@@ -55,9 +55,9 @@ function Get-AzureRdp {
 function Setup-AzureLab {
     param(
         $Location = "Central US",
-        $LabName = "ABSLab",
-        $StoageAccountName = "abslabstorage",
-        $AutomationAccountName = "ABSAutomation"
+        $LabName,
+        $StoageAccountName,
+        $AutomationAccountName
     )
 
     New-AzureAffinityGroup -Name $LabName
@@ -66,56 +66,22 @@ function Setup-AzureLab {
     New-AzureAutomationAccount -Name $AutomationAccountName -Location $Location
 }
 
-function New-ABSAzureVmWindows {
+function New-AzureVmWindows {
     param(
         $VmName,
         $VmSize = "Small",
         $Image = "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201506.01-en.us-127GB.vhd",
-        $AdminUsername = "alexadmin",
-        $AdminPassword = "supersecurepasswordhere",
-        #[ValidateSet("Windows","Linux")]$OsType,
+        $AdminUsername,
+        $AdminPassword,
         $Location = "Central US",
-        $LabName = "ABSLab",
-        $StoageAccountName = "abslabstorage",
-        $AutomationAccountName = "ABSAutomation"
+        $LabName,
+        $VnetName,
+        $StoageAccountName,
+        $AutomationAccountName
     )
-    <#
-    if(!($Image))
-    { 
-        $Image = Get-AzureImageName -OS Windows -Keyword "Windows Server 2012 R2 Datacenter"
-        $ImageName = $Image[0].ImageName
-    }
-    else { $ImageName = $Image.ImageName }
-    #>
-    $ImageName = $Image
-    $VnetName = "Group ABS01-RGroup ABS01-VNet"
 
-    $AzureVM = New-AzureVMConfig -Name $VmName -InstanceSize $VmSize -ImageName $ImageName -Verbose
-    $AzureVM = New-AzureVMConfig -Name $VmName -InstanceSize $VmSize -ImageName $ImageName -Verbose
+    $AzureVM = New-AzureVMConfig -Name $VmName -InstanceSize $VmSize -ImageName $Image -Verbose
+    $AzureVM = New-AzureVMConfig -Name $VmName -InstanceSize $VmSize -ImageName $Image -Verbose
     $AzureVM | Add-AzureProvisioningConfig -Windows -AdminUsername $AdminUsername -Password $AdminPassword -Verbose
     $AzureVM | New-AzureVM -ServiceName $LabName -Location $Location -Verbose -AffinityGroup $LabName
-
-
-    <#
-    switch ($OsType)
-    {
-        "Windows" {
-            $AzureVM | Add-AzureProvisioningConfig -Windows -AdminUsername $AdminUsername -Password $AdminPassword
-        }
-        "Linux" {
-            $AzureVM | Add-AzureProvisioningConfig -AdminUsername $AdminUsername -Password $AdminPassword
-        }
-    }
-    #>
 }
-<#
-New-ABSAzureVmWindows -VmName ABS-S01
-New-ABSAzureVmWindows -VmName ABS-S02
-New-ABSAzureVmWindows -VmName ABS-S03
-#>
-<#
-$Vms = "ABS-S02","ABS-S03"
-foreach($Vm in $Vms){
-    Remove-AzureVM -Name $Vm -DeleteVHD -ServiceName ABSLab
-}
-#>
