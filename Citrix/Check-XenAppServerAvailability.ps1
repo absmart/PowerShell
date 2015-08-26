@@ -32,11 +32,14 @@ if($Compare)
         $Service = Get-Service -Name ImaService -ComputerName $ServerName | Restart-Service -Force
         Write-Verbose "$ServerName was not found active in the server load object. Restarting ImaService to resolve!"
         $Table = @{
-            Title = "XenApp Server Unavailable"
+            Title = "$ServerName : XenApp Server Unavailable"
             User = $env:USERNAME
             Description = "$ServerName was not found active in the server load object. Restart-Service -Name ImaService cmdlet performed on $ServerName to resolve."
         }
         WriteTo-SPListViaWebService -url $SharePointUrl -list $SharePointList -Item $Table
+
+        Start-Sleep -Seconds 3
+        $FarmLoad = Invoke-Command -ComputerName $ServerName -ScriptBlock {qfarm /load}
 
         $EmailParams = @{
             To = $SmtpTo
@@ -44,7 +47,10 @@ if($Compare)
             SmtpServer = $SmtpServer
             Subject = "$ServerName Unavailable - ImaService Restarted!"
             Body = "The Check-XenAppServerAvailability process has detected that $ServerName was not listed in the active servers in the XenApp farm. 
-            Restart-Service -Name ImaService cmdlet has been performed on $ServerName to resolve the issue. Please verify the server re-connects to the farm properly."
+            Restart-Service -Name ImaService cmdlet has been performed on $ServerName to resolve the issue. Please verify the server re-connects to the farm properly.
+            
+            $FarmLoad
+            "
             Priority = "High"
         }
         Send-MailMessage @EmailParams
