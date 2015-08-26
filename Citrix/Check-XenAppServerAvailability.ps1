@@ -8,24 +8,24 @@ $XAServer = $citrix_environment.Farm01.DATA_COLLECTOR
 Import-Module (Join-Path $env:POWERSHELL_HOME "\Libraries\Sharepoint_Functions.ps1")
 Import-Module (Join-Path $env:POWERSHELL_HOME "\Libraries\General_Variables.psm1")
 
-$SharePointUrl = $deployment_tracking.DeploymentTracker.Url
-$SharePointList = $deployment_tracking.DeploymentTracker.List
+$SharePointUrl = $deployment_tracking.IssueTracker.Url
+$SharePointList = $deployment_tracking.IssueTracker.List
 
 $ActiveServers = Invoke-Command -ComputerName $XAServer -ScriptBlock{
     Add-PSSnapin Citrix.XenApp.Commands
 	$Results = Get-XAServerLoad | Sort ServerName
-	return $Results
-} | Select ServerName
+	return $Results | Select ServerName
+}
 
 $XAServerList = Invoke-Command -ComputerName $XAServer -ScriptBlock{
 	Add-PSSnapin Citrix.XenApp.Commands
-	$Results = Get-XAServer | Sort ServerName
-	return $Results
-} | Select ServerName | Where {$_.ServerName -ne "CDC-APP-XENP17"}
+    $Results = Get-XAServer | Sort ServerName 
+    return $Results | Select ServerName
+}
 
-$Compare = Compare-Object -ReferenceObject $ActiveServers -DifferenceObject $XAServerList
+$Compare = Compare-Object $XAServerList.ServerName $ActiveServers.ServerName
 
-if($Compare -ne $null)
+if($Compare)
 {
     foreach($ServerName in $Compare.InputObject.ServerName)
     {
