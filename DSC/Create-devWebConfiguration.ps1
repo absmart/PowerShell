@@ -101,7 +101,7 @@ configuration cConfiguration
             }
             
             # Required features and roles
-                        
+
             foreach($Feature in @(
                 "Web-Server","Application-Server","AS-WAS-Support","AS-HTTP-Activation",
                 "AS-TCP-Activation","AS-Named-Pipes","Web-Http-Redirect","Web-ASP",
