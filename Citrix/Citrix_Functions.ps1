@@ -133,3 +133,76 @@ function Get-XAAssignedUsersForApplication
 			return $Details
 		}
 }
+
+
+function Get-XASession
+{
+    param(
+        [string] $UserName,
+        [string] $ComputerName = $citrix_environment.Farm01.DATA_COLLECTOR,
+        [string] $UserDomain = $citrix_environment.Farm01.Domain
+    )
+
+    Invoke-Command -ComputerName $ComputerName -ArgumentList $UserName, $UserDomain -ScriptBlock {
+        param(
+            [string] $UserName,
+            [string] $UserDomain
+        )
+
+        Add-PSSnapin Citrix.XenApp.Commands
+
+        if($UserName -imatch $UserDomain)
+        {
+            $Account = $UserName
+            $Sessions = Get-XASession -Account $Account
+        }
+        else
+        {
+            $Account = Join-Path $UserDomain\ $UserName
+            $Sessions = Get-XASession -Account $Account
+        }
+
+        return $Sessions | ft
+    }
+}
+
+function Stop-XASession
+{
+    param(
+        [string] $UserName,
+        [string] $ComputerName = $citrix_environment.Farm01.DATA_COLLECTOR,
+        [string] $UserDomain = $citrix_environment.Farm01.Domain
+    )
+
+    Invoke-Command -ComputerName $ComputerName -ArgumentList $UserName, $UserDomain -ScriptBlock {
+        param(
+            [string] $UserName,
+            [string] $UserDomain
+        )
+
+        Add-PSSnapin Citrix.XenApp.Commands
+
+        if($UserName -imatch $UserDomain)
+        {
+            $Account = $UserName
+            $Sessions = Get-XASession -Account $Account
+        }
+        else
+        {
+            $Account = Join-Path $UserDomain\ $UserName
+            $Sessions = Get-XASession -Account $Account
+        }
+
+        try
+        {
+            $Sessions | Stop-XASession
+            Write-Host "The following sessions have been stopped." -ForegroundColor Green
+            return $Sessions | ft
+        }
+        catch
+        {
+            Write-Host "No sessions found for $Account." -ForegroundColor Yellow
+            return $Sessions | ft
+        }
+    }
+}
