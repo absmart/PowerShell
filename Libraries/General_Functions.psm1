@@ -119,6 +119,39 @@ function Get-RemoteDesktopSessions
     }
 }
 
+function Get-RemoteSessionsByUsername
+{
+    param(
+        $Username,
+        $ComputerName = "localhost"
+    )
+
+    foreach($Computer in $ComputerName){
+
+        $Query = $null
+        $Result = $null
+
+        $Query = qwinsta /server:$Computer | foreach { (($_.trim() -replace "\s+",","))} | ConvertFrom-Csv
+        if($Username -ne $null) { $Q = $Query | where {$_.USERNAME -match $Username} }
+        else { $Q = $Query }
+
+        if($Q -ne $null)
+        {
+            $Result = @{
+                SessionName = $Q.SessionName
+                Username = $Q.Username
+                ID = $Q.ID
+                State = $Q.State
+                Type = $Q.Type
+                Device = $Q.Device
+                ComputerName = $Computer
+            }
+            return $Result
+        }
+    }
+}
+
+
 function Disable-InternetExplorerESC 
 {
     $AdminKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
