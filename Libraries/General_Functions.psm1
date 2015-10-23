@@ -905,3 +905,21 @@ function Enter-PSSessionCredSSP
     )
     Enter-PSSession -ComputerName $Computer -Authentication Credssp -Credential $env:USERDOMAIN\$env:USERNAME
 }
+
+function Test-ConnectionUntilUp
+{
+    param (
+        $ComputerName
+    )
+    do
+    {
+        $End = "Down"
+        $Test = Test-Connection -ComputerName $ComputerName -Count 1 -ErrorAction SilentlyContinue
+        if($Test){
+            $Date = Get-Date
+            Write-Host "$Date - $ComputerName is back up!"
+            $End = "Up"
+        }
+    }
+    while ($End = "Down")
+}
