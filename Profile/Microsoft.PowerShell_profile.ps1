@@ -8,6 +8,8 @@
 
 #dir (Join-PATH $env:POWERSHELL_HOME "Libraries") | Where { $_.Name -imatch "\.psm1|\.dll" } | % { Write-Host $(Get-Date) " - Import Module " $_.FullName -foreground green ; Import-Module $_.FullName }
 
+Import-Module (Join-Path ${env:ProgramFiles(x86)} "\AWS Tools\PowerShell\AWSPowerShell\AWSPowerShell.psd1")
+Import-Module (Join-Path $env:LOCALAPPDATA "Github\shell.ps1")
 Import-Module (Join-Path $env:POWERSHELL_HOME "Citrix\Citrix_Functions.ps1")
 dir (Join-PATH $ENV:POWERSHELL_HOME "\Libraries") -filter *.ps1 | % { Write-Host $(Get-Date) " - Sourcing " $_.FullName -foreground green ; . $_.FullName }
 dir (Join-PATH $ENV:POWERSHELL_HOME "\Libraries") -filter *.psm1 | % { Write-Host $(Get-Date) " - Sourcing " $_.FullName -foreground green ; . $_.FullName }
