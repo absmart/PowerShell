@@ -6,10 +6,11 @@ if(!(Get-Module -Name AWSPowerShell)){
 }
 
 Initialize-AWSDefaults -ProfileName asmartProfile -Region us-west-2
+Set-DefaultAWSRegion -Region us-west-2
 
 Import-Module (Join-Path $env:POWERSHELL_HOME "\AWS\AWS_Variables.psm1")
 
-function Create-AWSKeyPair{
+function New-AWSKeyPair{
     param(
         $KeyName,
         $Path
