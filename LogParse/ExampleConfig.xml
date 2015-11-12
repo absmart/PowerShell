@@ -1,6 +1,6 @@
 <logparse>
 	<sites>
-		<site name="team.gt.com" id="W3SVC1234567890" /> <!-- Adjust to use the id and site name of the site. -->
+		<site name="site.domain.tld" id="W3SVC1234567890" /> <!-- Adjust to use the id and site name of the site. -->
 	</sites>
 	<log_path>D:\Logs\</log_path> <!-- Path to the root Logs directory for IIS sites. -->
 	<fileformat>u_exyyMMdd</fileformat> <!-- Formatting of the IIS log filename. -->
