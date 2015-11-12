@@ -1,0 +1,25 @@
+<logparse>
+	<sites>
+		<site name="team.gt.com" id="W3SVC1234567890" /> <!-- Adjust to use the id and site name of the site. -->
+	</sites>
+	<log_path>D:\Logs\</log_path> <!-- Path to the root Logs directory for IIS sites. -->
+	<fileformat>u_exyyMMdd</fileformat> <!-- Formatting of the IIS log filename. -->
+	<logging_range>daily</logging_range> <!-- Script also accepts monthly for this key element. -->
+	<queries>
+		<query>
+			 <!-- Update the query's table from MyTable01 to something more appropriate. Do the same for the output options. -->
+			<sql>"SELECT date, time, cs-username, s-port, cs-method, cs-uri-stem, sc-status, sc-bytes, cs-bytes, time-taken, cs(User-Agent) INTO MyTable01 FROM {0} WHERE cs-uri-stem NOT LIKE '%.asmx%' AND cs-method = 'GET' or cs-method = 'POST'"</sql>						
+			<option>-o:SQL -server:"SQLDatabaseServerName" -database:IISLogging -createTable:ON</option>
+		</query>
+		<query>
+			<!-- Update the query's table from MyTable01 to something more appropriate. Do the same for the output options. -->
+			<sql>"SELECT date, time, cs-username, s-port, cs-method, cs-uri-stem, sc-status, sc-bytes, cs-bytes, time-taken, cs(User-Agent) INTO MyTable02 FROM {0} WHERE cs-uri-stem NOT LIKE '%.jpg%' or cs-uri-stem NOT LIKE '%.asmx%'"</sql>
+			<option>-o:SQL -server:"SQLDatabaseServerName" -database:IISLogging -createTable:ON</option>
+		</query>
+		<query>
+			<!-- Update the query's table from MyTable01 to something more appropriate. Do the same for the output options. -->
+			<sql>"SELECT date, time, cs-username, s-port, cs-method, cs-uri-stem, sc-status, sc-bytes, cs-bytes, time-taken, cs(User-Agent) INTO MyTable03 FROM {0} WHERE cs-uri-stem NOT LIKE '%.asmx%' AND cs-method = 'GET' or cs-method = 'POST'"</sql>
+			<option>-o:SQL -server:"SQLDatabaseServerName" -database:IISLogging -createTable:ON</option>
+		</query>
+	</queries>
+</logparse>
