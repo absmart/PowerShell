@@ -1,4 +1,9 @@
 <logparse>
+	<!-- Sites can be defined either with "All" or specific sites on the system. -->
+	<!-- This example tells the LogParse script to run on ALL websites local on the server.
+	<sites>All</sites>
+	-->
+	<!-- This example only grabs logs from the specified site. -->
 	<sites>
 		<site name="site.domain.tld" id="W3SVC1234567890" /> <!-- Adjust to use the id and site name of the site. -->
 	</sites>
@@ -7,18 +12,26 @@
 	<logging_range>daily</logging_range> <!-- Script also accepts monthly for this key element. -->
 	<queries>
 		<query>
+		  <!-- 
+			If you want to use a not equals WHERE statement, use != instead of <>. 
+			The script will format the clause from the XML to the '<>' characters when submitting the query to logparser.
+			This is a workaround due to the way PowerShell attempts to convert XML to an object.
+		  -->
 			 <!-- Update the query's table from MyTable01 to something more appropriate. Do the same for the output options. -->
-			<sql>"SELECT date, time, cs-username, s-port, cs-method, cs-uri-stem, sc-status, sc-bytes, cs-bytes, time-taken, cs(User-Agent) INTO MyTable01 FROM {0} WHERE cs-uri-stem NOT LIKE '%.asmx%' AND cs-method = 'GET' or cs-method = 'POST'"</sql>						
+			<sql>"SELECT date, time, cs-username, s-port, cs-method, cs-uri-stem, sc-status, sc-bytes, cs-bytes, time-taken, cs(User-Agent) INTO {0} FROM {1} WHERE cs-uri-stem NOT LIKE '%.asmx%' AND cs-method = 'GET' or cs-method = 'POST'"</sql>						
+			<table>MyTable01</table>
 			<option>-o:SQL -server:"SQLDatabaseServerName" -database:IISLogging -createTable:ON</option>
 		</query>
 		<query>
 			<!-- Update the query's table from MyTable01 to something more appropriate. Do the same for the output options. -->
-			<sql>"SELECT date, time, cs-username, s-port, cs-method, cs-uri-stem, sc-status, sc-bytes, cs-bytes, time-taken, cs(User-Agent) INTO MyTable02 FROM {0} WHERE cs-uri-stem NOT LIKE '%.jpg%' or cs-uri-stem NOT LIKE '%.asmx%'"</sql>
+			<sql>"SELECT date, time, cs-username, s-port, cs-method, cs-uri-stem, sc-status, sc-bytes, cs-bytes, time-taken, cs(User-Agent) INTO {0} FROM {1} WHERE cs-uri-stem NOT LIKE '%.jpg%' or cs-uri-stem NOT LIKE '%.asmx%'"</sql>
+			<table>MyTable01</table>
 			<option>-o:SQL -server:"SQLDatabaseServerName" -database:IISLogging -createTable:ON</option>
 		</query>
 		<query>
 			<!-- Update the query's table from MyTable01 to something more appropriate. Do the same for the output options. -->
-			<sql>"SELECT date, time, cs-username, s-port, cs-method, cs-uri-stem, sc-status, sc-bytes, cs-bytes, time-taken, cs(User-Agent) INTO MyTable03 FROM {0} WHERE cs-uri-stem NOT LIKE '%.asmx%' AND cs-method = 'GET' or cs-method = 'POST'"</sql>
+			<sql>"SELECT date, time, cs-username, s-port, cs-method, cs-uri-stem, sc-status, sc-bytes, cs-bytes, time-taken, cs(User-Agent) INTO {0} FROM {1} WHERE cs-uri-stem NOT LIKE '%.asmx%' AND cs-method = 'GET' or cs-method = 'POST'"</sql>
+			<table>MyTable01</table>
 			<option>-o:SQL -server:"SQLDatabaseServerName" -database:IISLogging -createTable:ON</option>
 		</query>
 	</queries>

@@ -96,14 +96,14 @@ function Get-DscRegkeySettings {
 
 .EXAMPLE
  
- Start-PullConfigConsistency -ComputerName ent-web-f01u01
+ Start-PullConfigConsistency -ComputerName webServer
  
 #>
 function Start-DscConfigurationUpdate {
 
 	param(
 		$Computers
-		)
+	)
 
 	Invoke-Command -ComputerName $Computers -ScriptBlock{
         try
