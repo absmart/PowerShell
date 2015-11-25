@@ -6,8 +6,8 @@ param(
 
 $Config = [xml] ( Get-Content $ConfigFile )
 
-function Get-IISFileName 
-{			
+function Get-IISFileName
+{
 	param(
 		[string] $LogFormat,
 	    [ValidateSet("Daily","Monthly")] $Range = "Daily"
@@ -43,13 +43,24 @@ foreach( $Site in $Sites )
 	}
 
 	$Log =  $LogPath + "\" + $id + "\" + $LogName
-				
-	if( Test-Path $Log ) 
+
+	if( Test-Path $Log )
 	{
 		foreach($Query in $Queries)
 		{
-            $Sql = ($Query.sql -f $Log) + " " + $Query.option
+            if($Query.sql -imatch '!='){
+                $SqlQuery = ($Query.sql.Replace("!=","<>") -f $Log) # Replace the != with <> as Logparser doesn't support != input.
+            }
+            else{
+                $SqlQuery = $Query.sql
+            }
+
+            $Sql = $SqlQuery + " " + $Query.option # Adding space for formatting syntax.
+
+            Write-Verbose "SqlQuery ::: $SqlQuery"
+            Write-Verbose "Options ::: $Query.option"
             Write-Verbose "Sql variable : $Sql"
+
 			&$LOGPARSE $sql
 		}
 	}
