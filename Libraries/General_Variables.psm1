@@ -34,16 +34,22 @@ $citrix_environment =@{
         DATA_COLLECTOR = @("COLLECTOR01")
         DATA_STORE = @("SQLSERVER01")
         DATABASE = @("XENAPP01")
-        XENAPP_SERVERS = @("XEN01","XEN02","XEN03","XEN04","XEN05","XEN06","XEN07","XEN08")
+        XENAPP_SERVERS = @("XEN101","XEN102","XEN103")
         });
     "Farm02" = (New-Object -TypeName PSObject -Property @{
         FARM_VERSION = @("7.x")
         DATA_COLLECTOR = @("COLLECTOR02")
         DATA_STORE = @("SQLSERVER02")
         DATABASE = @("XENAPP02")
-        XENAPP_SERVERS = @("XEN01","XEN02","XEN03","XEN04","XEN05","XEN06","XEN07","XEN08")
+        XENAPP_SERVERS = @("XEN201","XEN202","XEN203")
         WEBSERVICEURL = [string]@("deliverycontroller.domain.com:80") # WebServiceUrl is used for Citrix 7.x farms only.
         });
+    "Farm03" = (New-Object -TypeName PSObject -Property @{
+        FARM_VERSION = @("4.x")
+        DATA_COLLECTOR = @("COLLECTOR03")
+        DATABASE = @("XENAPP03")
+        XENAPP_SERVERS = @("XEN301","XEN302","XEN303")
+    })
     "Logging" = (New-Object -TypeName PSObject -Property @{
         SQLServer = "LoggingServerName"
         Database = "XenAppLogging"

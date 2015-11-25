@@ -4,10 +4,10 @@
     $SmtpServer
 )
 
-$XAServer = $citrix_environment.Farm01.DATA_COLLECTOR
 Import-Module (Join-Path $env:POWERSHELL_HOME "\Libraries\Sharepoint_Functions.ps1")
 Import-Module (Join-Path $env:POWERSHELL_HOME "\Libraries\General_Variables.psm1")
 
+$XAServer = $citrix_environment.Farm01.DATA_COLLECTOR
 $SharePointUrl = $deployment_tracking.IssueTracker.Url
 $SharePointList = $deployment_tracking.IssueTracker.List
 

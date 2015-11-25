@@ -1,9 +1,4 @@
-﻿<#
-    **
-    THIS CONFIGURATION IS STILL IN DEVELOPMENT. DO NOT RUN THIS ON PRODUCTION SYSTEMS!
-    **
-#>
-param(
+﻿param(
     [ValidateSet("Production","UAT","Development","QA","Test")] $Environment,
     [ValidateSet("CitrixServer","SharePointServer","ApplicationServer","WebServer","dotNetFarm")] $ServerType,
     $OutPath = $null,
