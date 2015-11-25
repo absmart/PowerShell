@@ -1,34 +1,34 @@
 ﻿<#
 .SYNOPSIS 
  
- This script is used to remotely configure a system for a specific environment and server type based on pre-created LCM schema MOF configurations. This script is
- used with the assumption that a system is already on a domain, has remote PowerShell enabled, CredSSP enabled, and other considerations.
-
- Use this script to add existing systems to DSC. Do not use this script for a system that has not undergone previous automations to configure an AppOps system.
+ This script is used to remotely configure a system for a specific environment and server type based on pre-created LCM schema MOF configurations. 
+ The assumption is that a system is already on a domain, has remote PowerShell enabled, CredSSP enabled, etc.
+ The initial vision of this script was to maintain a quick/easy way to bootstrap new DSC nodes by installing a common shared certificate for
+ securing PSCredential objects, copying the LCM MOF, configuring the LCM, and starting the DSC engine.
+ 
 
 .EXAMPLE
  
  .\Setup-LocalConfigurationManager.ps1 -Computers WebServer01 -Environment UAT -ServerType -WebServer -StartDscConfiguration True
 
- In this example DSC will be configured for a UAT web server.
-
  The StartDscConfiguration variable is True, which means the Consistency scheduled task will be run immediately after the LCM is configured
  and any configurations specific to that system and environment type will be immediately applied to the system.
  
+
 .TODO
  - Add pre-flight checks that make sure Posh is > 4.0.
  - Allow passing certificate information (for shared model)
  - Figure out a way to pass individual certs per machine
     - either by using self-signed ones created on the node or from active directory (pki)
     # http://serverfault.com/questions/632390/protecting-credentials-in-desired-state-configuration-using-certificates
- 
 #>
+
 param(
     $Computers,
     [ValidateSet("Production","UAT","Development","Test","QA")] $Environment,
     [ValidateSet("CitrixServer","SharePointServer","ApplicationServer","dotNetFarm","WebServer")] $ServerType,
     $DscCertificatePass = $null,
-    [ValidateSet($True,$False)] $StartDscConfiguration = $False    
+    [ValidateSet($True,$False)] $StartDscConfiguration = $False
     )
 
 $Credentials = Get-Credential -UserName ($env:USERDOMAIN + "\" +$env:USERNAME) -Message "Please enter administrative credentials:"
@@ -81,7 +81,7 @@ Invoke-Command -ComputerName $Computers -Authentication Credssp -Credential $Cre
     
     $TempFolder = Test-Path C:\temp
     if($TempFolder -eq $false)
-    {
+    {   
         New-Item -Path C:\Temp -ItemType Directory
     }
     
@@ -109,3 +109,24 @@ Invoke-Command -ComputerName $Computers -Authentication Credssp -Credential $Cre
         }
     }
 }
+
+
+<#
+# Not used just yet!
+configuration Localhost
+{
+    LocalConfigurationManager
+    {
+        AllowModuleOverwrite = $true
+        CertificateID = $ThumbPrint;
+        ConfigurationID = $Guid
+        RefreshMode = "PULL";
+        DownloadManagerName = "WebDownloadManager";
+        RebootNodeIfNeeded = $false;
+        RefreshFrequencyMins = 30;
+        ConfigurationModeFrequencyMins = 30;
+        ConfigurationMode = "ApplyAndAutoCorrect";
+        DownloadManagerCustomData = @{ServerUrl = "http://$PullServer/DSC/PSDSCPullServer.svc"; AllowUnsecureConnection = "FALSE"}
+    }
+}
+#>
