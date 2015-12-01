@@ -91,7 +91,6 @@ function Add-SQLProviders
 }
 New-Alias -Name sql -Value Add-SQLProviders
 
-# Edit the local system's HOSTS file.
 function Edit-HostFile
 {
 	&$env:editor c:\Windows\System32\drivers\etc\hosts
@@ -153,6 +152,8 @@ function Go-PowerShellDirectory
     cd $ENV:POWERSHELL_HOME
 }
 Set-Alias -Name gpow -Value Go-PowerShellDirectory
+
+Set-Alias -Name grep -Value findstr
 
 Remove-Item alias:cd
 function cd
