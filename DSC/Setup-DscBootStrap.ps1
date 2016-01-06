@@ -9,40 +9,85 @@
 
 .EXAMPLE
  
- .\Setup-LocalConfigurationManager.ps1 -Computers WebServer01 -Environment UAT -ServerType -WebServer -StartDscConfiguration True
+ .\Setup-LocalConfigurationManager.ps1 -Computers WebServer01 -Environment UAT -ServerType -WebServer -StartDscConfiguration
 
- The StartDscConfiguration variable is True, which means the Consistency scheduled task will be run immediately after the LCM is configured
+ The StartDscConfiguration variable is set, which means the Consistency scheduled task will be run immediately after the LCM is configured
  and any configurations specific to that system and environment type will be immediately applied to the system.
  
 
 .TODO
- - Add pre-flight checks that make sure Posh is > 4.0.
+ - Add pre-flight checks that make sure Posh is > 4.0, certificate is installed and remote execution enabled.
+
  - Allow passing certificate information (for shared model)
- - Figure out a way to pass individual certs per machine
+
+ - Figure out a way to pass individual certs per machine, probably will be in a separate script.
     - either by using self-signed ones created on the node or from active directory (pki)
     # http://serverfault.com/questions/632390/protecting-credentials-in-desired-state-configuration-using-certificates
 #>
 
 param(
-    $Computers,
-    [ValidateSet("Production","UAT","Development","Test","QA")] $Environment,
-    [ValidateSet("CitrixServer","SharePointServer","ApplicationServer","dotNetFarm","WebServer")] $ServerType,
-    $DscCertificatePass = $null,
-    [ValidateSet($True,$False)] $StartDscConfiguration = $False
-    )
+    [System.String[]] $ComputerName,
+    [System.String][ValidateSet("Production","UAT","Development","Test","QA")] $Environment,
+    [System.String][ValidateSet("CitrixServer","SharePointServer","ApplicationServer","dotNetFarm","WebServer")] $ServerType,
+    [System.String]$DscCertificatePass = $null,
+    [Switch] $StartDscConfiguration
+)
+
+Import-Module (Join-Path $ENV:POWERSHELL_HOME "\DSC\DSC_Functions.ps1")
+Import-Module (Join-Path $ENV:POWERSHELL_HOME "\Libraries\General_Variables.psm1")
+
+$SharedCertificateRemotePath = $dsc_environment.SharedCertificate.RemotePath
+$SharedCertificateLocalPath = $dsc_environment.SharedCertificate.StorePath
+$SharedCertificateThumbprint = $dsc_environment.SharedCertificate.Thumbprint
+
+# This script assumes we're using a private certificate to share with all PCs using DSC.
+# An alternative would be to create a self-signed certificate locally, copying/importing to the system authoring the MOF
+# and securing it with the copied certificate. This is something I'll be doing later on as it requires a significant amount of code changes.
+
+if($DscCertificatePass -eq $null)
+{ $DscCertificatePass = Read-Host "Enter the passphrase for the DSCCredentialCertificate_Private.cer.pfx file:" }
+$SecurePfxPass = $DscCertificatePass | ConvertTo-SecureString -AsPlainText -Force
+$DscCertificatePass = Get-Random -SetSeed (Get-Random) # Null out the unsecure string later to lessen the chance of secure strings in memory.
+
+# Get credentials so we don't need to request it for every foreach in the script.
 
 $Credentials = Get-Credential -UserName ($env:USERDOMAIN + "\" +$env:USERNAME) -Message "Please enter administrative credentials:"
 
-# Get shared certificate password and convert to secure value.
-if($DscCertificatePass -eq $null)
-{
-    # This script assumes we're using a private certificate to share with all PCs using DSC.
-    # An alternative would be to create a self-signed certificate locally, copying/importing to the system authoring the MOF
-    # and securing it with the copied certificate. This is something I'll be doing later on as it requires individual GUIDs.
-    $DscCertificatePass = Read-Host "Enter the passphrase for the DSCCredentialCertificate_Private.cer.pfx file:"
+
+
+######### Pre-flight checks! ##########
+
+foreach($Computer in $ComputerName){
+
+    $ValidComputers = @()
+
+    # Check remote access to the system, enable if needed.
+
+    $RemoteResult = Test-RemoteExecution -ComputerName $Computer -Enable
+
+    # Check if the shared certificate is installed, install if missing.
+
+    $CertResult = Test-DscSharedCertificate -ComputerName $Computer -Thumbprint $SharedCertificateThumbprint
+
+    foreach($Cert in $CertResult | Where-Object {$_.CertificateInstalled -eq $False}){
+
+        $CertificateParams =@{
+            ComputerName = $Cert.ComputerName
+            CertificateRemotePath = $SharedCertificateRemotePath
+            PfxPass = $DscCertificatePass
+            Credentials = $Credentials
+        }
+        Install-DscSharedCertificate @CertificateParams
+    }
+
+    # Check powershell 4.0 or greater
+    $PSVersions = Get-PowerShellVersion -ComputerName $ComputerName
+
 }
-$SecurePfxPass = $DscCertificatePass | ConvertTo-SecureString -AsPlainText -Force
-$DscCertificatePass = Get-Random -SetSeed (Get-Random) # Null out the unsecure string to lessen the chance of secure strings in memory.
+
+
+
+
 
 Invoke-Command -ComputerName $Computers -Authentication Credssp -Credential $Credentials -ArgumentList $Environment,$ServerType,$SecurePfxPass,$StartDSCConfiguration -ScriptBlock{
     param(
@@ -55,8 +100,7 @@ Invoke-Command -ComputerName $Computers -Authentication Credssp -Credential $Cre
     $CertificateThumbprint = "" # Add the Thumbprint of the private certificate here # need to put into splat
     #$SecurePfxPass = ConvertTo-SecureString $DscCertificatePass -AsPlainText -Force # removed 11/25
     $Cert = "" # Add the location of the Pfx file here # go into a plat
-
-
+    
     # does this need to be a whole function?
     function Import-PfxCertificate 
     {    
@@ -75,7 +119,7 @@ Invoke-Command -ComputerName $Computers -Authentication Credssp -Credential $Cre
  	    $store.open("MaxAllowed")
  	    $store.add($pfx)
  	    $store.close()  
-    } 
+    }
 
 	Import-PfxCertificate -certpath $cert -pfxPass $SecurePfxPass
     
@@ -109,7 +153,6 @@ Invoke-Command -ComputerName $Computers -Authentication Credssp -Credential $Cre
         }
     }
 }
-
 
 <#
 # Not used just yet!
