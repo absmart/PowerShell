@@ -422,6 +422,15 @@ function Import-PfxCertificate
  	$store.close()
 }
 
+function Get-Certificate
+{
+    param(
+        $Path
+    )
+    $Cert = Get-ChildItem -Path $Path
+    return $Cert
+}
+
 function Remove-Certificate
 {
  	param(
@@ -1005,4 +1014,24 @@ function Test-ConnectionUntilUp
         }
     }
     while ($End = "Down")
+}
+
+function Get-ServiceDetail
+{
+    param(
+        $Name = $null,
+        $ComputerName = 'localhost',
+        [switch] $NotSystemUser
+    )
+    foreach($Computer in $ComputerName){
+        if($NotSystemUser){
+            Get-WmiObject -Class Win32_Service -ComputerName $Computer -Filter "Name like '%$Name%'" | 
+                Where-Object {$_.StartName -notmatch 'LocalSystem' -and $_.StartName -notmatch 'NetworkService' -and $_.StartName -notmatch 'LocalService'} | 
+                Select PSComputerName, DisplayName, Name, StartName, State, Description, PathName, ProcessId, ServiceType
+        }
+        else{
+            Get-WmiObject -Class Win32_Service -ComputerName $Computer -Filter "Name like '%$Name%'" | 
+                Select PSComputerName, DisplayName, Name, StartName, State, Description, PathName, ProcessId, ServiceType
+        }
+    }
 }

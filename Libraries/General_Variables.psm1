@@ -26,6 +26,12 @@ $dsc_environment = @{
         CertificatePath = "\\PullServer\ShareName\"
         CertificateName = "\\PullServer\ShareName\CertName.pfx"
 		})
+    "SharedCertificate" = (New-Object -TypeName PSObject -Property @{
+        Name = "DSC Shared Certificate"
+        RemotePath = "\\UNCShare\Path\To\DSC\Certificate.pfx"
+        StorePath = "Cert:\LocalMachine\My"
+        Thumbprint = "ABCDEFGH01234567890"
+    })
 }
 
 $citrix_environment =@{
