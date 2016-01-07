@@ -240,9 +240,10 @@ function Set-XAServiceRecovery{
     }
 }
 
-function Get-XAWindowsEvent{
+function Get-XAWindowsEvent
+{
     param(
-        $ComputerName
+        $ComputerName,
         [System.Int32] $Days = "1"
     )
     $YDate = (Get-Date.AddDays(-$Days))    
@@ -259,5 +260,37 @@ function Get-XAWindowsEvent{
         $Events += Get-EventLog -LogName System -Source Metaframe -After $YDate -Before $TDate -EntryType Error -ErrorAction SilentlyContinue
         return $Events
     }
+    return $Results
+}
+
+function Get-XATrendingByUser
+{
+    param(
+        $User = $null
+    )
+    $Columns = @()
+    $Server = $citrix_environment.Logging.LoggingServerName
+    $Database = $citrix_environment.Logging.XenAppLogging
+    if($User -eq $null){
+        $tSQL = "SELECT TOP 50 [Date],[AccountDisplayName],[ProcessName],[SessionId],[ProcessId],[XAServer],[CreationTime],[MemoryUsedInMB] FROM [CitrixLogging].[dbo].[SessionProcesses] ORDER BY DATE DESC"
+    }
+    else{
+        $tSQL = "SELECT TOP 50 [Date],[AccountDisplayName],[ProcessName],[SessionId],[ProcessId],[XAServer],[CreationTime],[MemoryUsedInMB] FROM [CitrixLogging].[dbo].[SessionProcesses] WHERE AccountDisplayName LIKE '%$User%' ORDER BY DATE DESC"
+    }
+
+    $Connection = "Server=$Server;Integrated Security=true;Initial Catalog=$Database"
+    $DataSet = New-Object "System.Data.DataSet" "DataSet"
+    $DataAdapter = New-Object "System.Data.SqlClient.SqlDataAdapter" ($Connection)
+    $DataAdapter.SelectCommand.CommandText = $tSQL
+    $DataAdapter.SelectCommand.Connection = $Connection
+
+    $DataAdapter.Fill($DataSet) | Out-Null
+    $DataSet.Tables[0].Columns | Select ColumnName | Foreach-Object { $Columns += $_.ColumnName }
+    $Results = $DataSet.Tables[0].Rows | Select $Columns
+
+    $DataSet.Clear()
+    $DataAdapter.Dispose()
+    $DataSet.Dispose()
+
     return $Results
 }
