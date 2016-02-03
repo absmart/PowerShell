@@ -401,25 +401,44 @@ function Get-ScheduledTasks
 function Import-PfxCertificate
 {
     param(
-		[String] $certPath,
-		[String] $certRootStore = "LocalMachine",
-		[String] $certStore = "My",
-		[object] $pfxPass = $null
-    )
-
-	$pfx = new-object System.Security.Cryptography.X509Certificates.X509Certificate2
+		[String] $CertPath,
+		[String] $CertRootStore = "LocalMachine",
+		[String] $CertStore = "My",
+        [object] $PfxPass = $null,
+        [pscredential] $Credential
+    )	
 
     if ($pfxPass -eq $null)
 	{
-		$pfxPass = read-host "Enter the pfx password" -assecurestring
+		$PfxPass = read-host "Enter the pfx password" -assecurestring
 	}
+    
+    if($ComputerName){
+        Invoke-Command -ComputerName $ComputerName -ArgumentList $CertPath,$CertRootStore,$CertStore,$PfxPass -ScriptBlock{
+            param(
+                $CertPath,
+                $CertRootStore,
+                $CertStore,
+                $PfxPass
+            )
+            $Pfx = new-object System.Security.Cryptography.X509Certificates.X509Certificate2
+            $Pfx.import($CertPath,$PfxPass,"Exportable,PersistKeySet")
 
-    $pfx.import($certPath,$pfxPass,"Exportable,PersistKeySet")
+ 	        $Store = new-object System.Security.Cryptography.X509Certificates.X509Store($CertStore,$CertRootStore)
+ 	        $Store.open("MaxAllowed")
+ 	        $Store.add($Pfx)
+ 	        $Store.close()
+        }
+    }
+    else{
+        $Pfx = new-object System.Security.Cryptography.X509Certificates.X509Certificate2
+        $Pfx.import($CertPath,$PfxPass,"Exportable,PersistKeySet")
 
- 	$store = new-object System.Security.Cryptography.X509Certificates.X509Store($certStore,$certRootStore)
- 	$store.open("MaxAllowed")
- 	$store.add($pfx)
- 	$store.close()
+ 	    $Store = new-object System.Security.Cryptography.X509Certificates.X509Store($CertStore,$CertRootStore)
+ 	    $Store.open("MaxAllowed")
+ 	    $Store.add($Pfx)
+ 	    $Store.close()
+    }
 }
 
 function Get-Certificate
@@ -434,16 +453,32 @@ function Get-Certificate
 function Remove-Certificate
 {
  	param(
+        $ComputerName,
 		[String] $subject,
 		[String] $certRootStore = "LocalMachine",
 		[String] $certStore = "My"
     )
-
-	$cert = Get-ChildItem -path cert:\$certRootStore\$certStore | where { $_.Subject.ToLower().Contains($subject) }
-	$store = new-object System.Security.Cryptography.X509Certificates.X509Store($certStore,$certRootStore)
-	$store.Open("ReadWrite")
-	$store.Remove($cert)
-	$store.Close()
+    if($ComputerName){
+        Invoke-Command -ComputerName $ComputerName -ArgumentList $subject,$certRootStore,$certStore -ScriptBlock{
+            param(
+                $subject,
+                $certRootStore,
+                $certStore
+            )
+	        $cert = Get-ChildItem -path cert:\$certRootStore\$certStore | where { $_.Subject.ToLower().Contains($subject) }
+	        $store = New-Object System.Security.Cryptography.X509Certificates.X509Store($certStore,$certRootStore)
+	        $store.Open("ReadWrite")
+	        $store.Remove($cert)
+	        $store.Close()
+        }
+    }
+    else{
+        $cert = Get-ChildItem -path cert:\$certRootStore\$certStore | where { $_.Subject.ToLower().Contains($subject) }
+	    $store = New-Object System.Security.Cryptography.X509Certificates.X509Store($certStore,$certRootStore)
+	    $store.Open("ReadWrite")
+	    $store.Remove($cert)
+	    $store.Close()
+    }
 }
 
 function Export-Certificate
