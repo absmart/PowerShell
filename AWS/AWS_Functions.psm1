@@ -5,7 +5,7 @@ if(!(Get-Module -Name AWSPowerShell)){
     catch{Write-Host "Failed to import the AWSPowerShell module. Verify the AWS PowerShell tools are installed!" -ForegroundColor Red; $_.Exception.Message}
 }
 
-Initialize-AWSDefaults -ProfileName asmartProfile -Region us-west-2
+#Initialize-AWSDefaults -ProfileName asmartProfile -Region us-west-2
 Set-DefaultAWSRegion -Region us-west-2
 
 Import-Module (Join-Path $env:POWERSHELL_HOME "\AWS\AWS_Variables.psm1")
