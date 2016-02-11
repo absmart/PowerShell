@@ -19,6 +19,16 @@ function New-AWSKeyPair{
     $KeyPair.KeyMaterial | Out-File -Encoding ascii $Path
 }
 
+function Get-EC2ImagesByPlatform{
+    param(
+        $FilterValue = "windows"
+    )
+    $platform_values = New-Object 'collections.generic.list[string]'
+    $platform_values.add($FilterValue)
+    $filter_platform = New-Object Amazon.EC2.Model.Filter -Property @{Name = "platform"; Values = $platform_values}
+    Get-EC2Image -Owner amazon, self -Filter $filter_platform
+}
+
 <#
 # Amazon Linux AMI 2015.09.1 x86_64 HVM EBS
 [system.string] $Image = $aws_defaults.ami.AmazonLinuxHVM
