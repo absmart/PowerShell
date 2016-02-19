@@ -1,4 +1,5 @@
-﻿Import-Module Azure
+﻿Import-Module (Join-Path $env:POWERSHELL_HOME "\Azure\Azure_Variables.psm1")
+Import-Module Azure
 Add-AzureAccount
 
 function ConnectTo-AzureInstance {
@@ -69,14 +70,14 @@ function Setup-AzureLab {
 function New-AzureVmWindows {
     param(
         $VmName,
-        $VmSize = "Small",
-        $Image = "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201506.01-en.us-127GB.vhd",
+        $VmSize = "Standard_DS1",
+        $Image = $azure.images.windows2012r2,
         $AdminUsername,
         $AdminPassword,
         $Location = "Central US",
         $LabName,
         $VnetName,
-        $StoageAccountName,
+        $StorageAccountName,
         $AutomationAccountName
     )
 
@@ -85,3 +86,5 @@ function New-AzureVmWindows {
     $AzureVM | Add-AzureProvisioningConfig -Windows -AdminUsername $AdminUsername -Password $AdminPassword -Verbose
     $AzureVM | New-AzureVM -ServiceName $LabName -Location $Location -Verbose -AffinityGroup $LabName
 }
+
+New-AzureVmWindows -VmName "" -AdminUsername alex -AdminPassword ""
