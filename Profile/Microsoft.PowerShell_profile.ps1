@@ -1,7 +1,7 @@
-﻿<#
+<#
 .SYNOPSIS
- This is a PowerShell profile used to import many different modules (custom, for specific apps and more!) automatically when PowerShell is started. 
- Place this file in "%USERPROFILE%\Documents\windowsPowerShell" to have it run on PowerShell startup. Don't forget to have the Scripts folder copied beforehand!
+ This is a PowerShell profile used to import many different modules (custom, for specific apps and more!) automatically when PowerShell is started.
+ Place this file in "%USERPROFILE%\Documents\windowsPowerShell" to have it run on PowerShell startup. Don't forget to have the POWERSHELL_HOME folder copied beforehand!
 #>
 
 # Join paths for the local SCRIPTS_HOME folder and import the PSM1, PS1 and DLLs.
@@ -9,31 +9,34 @@
 #dir (Join-PATH $env:POWERSHELL_HOME "Libraries") | Where { $_.Name -imatch "\.psm1|\.dll" } | % { Write-Host $(Get-Date) " - Import Module " $_.FullName -foreground green ; Import-Module $_.FullName }
 
 Import-Module (Join-Path ${env:ProgramFiles(x86)} "\AWS Tools\PowerShell\AWSPowerShell\AWSPowerShell.psd1")
-Import-Module (Join-Path $env:LOCALAPPDATA "Github\shell.ps1")
-#Import-Module (Join-Path $env:POWERSHELL_HOME "Citrix\Citrix_Functions.ps1")
-dir (Join-PATH $ENV:POWERSHELL_HOME "\Libraries") -filter *.ps1 | % { Write-Host $(Get-Date) " - Sourcing " $_.FullName -foreground green ; . $_.FullName }
-dir (Join-PATH $ENV:POWERSHELL_HOME "\Libraries") -filter *.psm1 | % { Write-Host $(Get-Date) " - Sourcing " $_.FullName -foreground green ; . $_.FullName }
+Import-Module (Join-Path $ENV:POWERSHELL_HOME "\AWS\AWS_Functions.psm1")
+Set-DefaultAWSRegion -Region us-west-2
 
-$MaximumHistoryCount=1024 
+function Load-AzureRM{
+    Import-AzureRM | Out-Null
+    try{Get-AzureRmSubscription}
+    catch{Login-AzureRmAccount}
+}
+Set-Alias -Name Load-AzureRM -Value arm
+
+Import-Module Azure
+
+#Get-ChildItem GJoin-PATH $ENV:POWERSHELL_HOME "\Libraries") -filter *.psm1 | % { Write-Host $(Get-Date) " - Importing " $_.FullName -foreground green ; . $_.FullName -ErrorAction SilentlyContinue }
+
+$FunctionFiles = Get-ChildItem (Join-Path $ENV:POWERSHELL_HOME "\Libraries")
+
+foreach($Function in $FunctionFiles){
+    Write-Host $(Get-Date) " - Importing " $Function.FullName -ForegroundColor Green
+    Import-Module -Name $Function.FullName -ErrorAction SilentlyContinue -DisableNameChecking
+}
+
+$MaximumHistoryCount=1024
 $env:EDITOR = "powershell_ise.exe"
 
-New-Alias -name gh -value Get-History 
+New-Alias -name gh -value Get-History
 New-Alias -name i -value Invoke-History
 New-Alias -name ed -value $env:EDITOR
 
-$Nas01 = "NasName01"
-$Nas01SharePath = "\\nasname01\share1"
-
-if( (Test-Connection $Nas01) -and (Test-Path $Nas01SharePat) )
-{
-	Write-Host $(Get-Date) " - Setting up Repo to $Nas01SharePath\Repo" -foreground green
-	New-PSdrive -name Repo -psprovider FileSystem -root "$Nas01SharePath\Repo" | Out-Null
-	Write-Host $(Get-Date) " - Setting up SharePoint  to $Nas01SharePath\SharePoint" -foreground green
-	New-PSdrive -name SharePoint -psprovider FileSystem -root $Nas01SharePath\SharePoint | Out-Null
-	Write-Host $(Get-Date) " - Setting up NAS  to $Nas01SharePath\NAS" -foreground green
-	New-PSdrive -name NAS -psprovider FileSystem -root "$Nas01SharePath\NAS" | Out-Null
-}
-# Resizes PowerShell window width.
 function Resize-Screen
 {
 	param (
@@ -50,7 +53,7 @@ function Resize-Screen
 # Loads this file in PowerShell
 function Load-Profile
 {
-    . $profile 
+    . $profile
 }
 # Opens this file in ISE.
 function Get-Profile
@@ -76,11 +79,11 @@ function Add-Cloud-Modules
 	Write-Host $(Get-Date) " - Importing Azure Module"
 	Push-Location $PWD.Path
 	Get-ChildItem 'C:\Program Files (x86)\Microsoft SDKs\Windows Azure\PowerShell\Azure\*.psd1' | ForEach-Object {Import-Module $_}
-	
+
 	Write-Host $(Get-Date) " - Importing Office 365 Modules"
 	Import-Module MSOnline -DisableNameChecking
 	Import-Module Microsoft.Online.SharePoint.PowerShell -DisableNameChecking
-	Pop-Location 
+	Pop-Location
 }
 New-Alias -Name cloud -Value Add-Cloud-Modules
 
@@ -96,25 +99,6 @@ function Edit-HostFile
 	&$env:editor c:\Windows\System32\drivers\etc\hosts
 }
 Set-Alias -Name hf -Value Edit-HostFile
-
-function rsh 
-{
-	param ( [string] $computer )
-	Enter-PSSession -ComputerName $computer -Credential (Get-Creds) -Authentication Credssp
-}
-
-function rexec
-{
-	param ( [string[]] $computers = $ENV:ComputerName, [ScriptBlock] $sb = {} )
-	Invoke-Command -ComputerName $computers -Credential (Get-Creds) -Authentication Credssp -ScriptBlock $sb
-}
-
-function Remove-OfficeLogs
-{
-	Remove-Item D:\*.log -ErrorAction SilentlyContinue
-	Remove-Item C:\*.log -ErrorAction SilentlyContinue
-}
-Remove-OfficeLogs
 
 function Go-Home
 {
@@ -171,10 +155,10 @@ function cd
 	}
 }
 
-function shorten-path([string] $path) { 
-   $loc = $path.Replace($HOME, '~') 
-   $loc = $loc -replace '^[^:]+::', '' 
-   return ($loc -replace '\\(\.?)([^\\])[^\\]*(?=\\)','\$1$2') 
+function shorten-path([string] $path) {
+   $loc = $path.Replace($HOME, '~')
+   $loc = $loc -replace '^[^:]+::', ''
+   return ($loc -replace '\\(\.?)([^\\])[^\\]*(?=\\)','\$1$2')
 }
 
 function prompt
@@ -190,20 +174,20 @@ function prompt
 }
 
 & {
-    for ($i = 0; $i -lt 26; $i++) 
-    { 
+    for ($i = 0; $i -lt 26; $i++)
+    {
         $funcname = ([System.Char]($i+65)) + ':'
-        $str = "function global:$funcname { set-location $funcname } " 
-        invoke-expression $str 
+        $str = "function global:$funcname { set-location $funcname } "
+        invoke-expression $str
     }
 }
 
 Remove-Item alias:ls
 Set-Alias ls Get-ChildItemColor
- 
+
 function Get-ChildItemColor {
     $fore = $Host.UI.RawUI.ForegroundColor
- 
+
     Invoke-Expression ("Get-ChildItem $args") |
     %{
       if ($_.GetType().Name -eq 'DirectoryInfo') {
@@ -245,6 +229,3 @@ function Get-ChildItemColor {
       }
     }
 }
-
-Remove-OfficeLogs
-Remove-TempFolder
