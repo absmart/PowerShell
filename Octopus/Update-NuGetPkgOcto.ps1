@@ -1,4 +1,4 @@
-﻿Set-Location "D:\Users\us46009\OneDrive - Grant Thornton LLP\ABS\Deployment"
+﻿Set-Location "D:\Users\ABS\Deployment"
 $apikey = "API-LEJYJLZT3SWXEGB5PHONIKQGLE"
 
 $pkgs = Get-ChildItem .\pkg -Recurse
