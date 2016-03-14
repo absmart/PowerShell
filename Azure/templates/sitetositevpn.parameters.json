@@ -3,22 +3,22 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-            "value": "West US"
+            "value": "North Central US"
         },
         "vpnType": {
-            "value": "RouteBased"
+            "value": "PolicyBased"
         },
         "localGatewayName": {
             "value": "localGateway"
         },
         "localGatewayIpAddress": {
-            "value": "1.1.1.1"
+            "value": "99.88.77.66"
         },
         "localAddressPrefix": {
-            "value": "192.168.0.0/16"
+            "value": "192.168.0.0/24"
         },
         "virtualNetworkName": {
-            "value": "azureVnet"
+            "value": "Vnet"
         },
         "azureVNetAddressPrefix": {
               "value": "10.3.0.0/16"
@@ -33,16 +33,16 @@
              "value": "10.3.200.0/29"
         },
         "gatewayPublicIPName": {
-            "value": "azureGatewayIP"
+            "value": "GatewayIP"
         },
         "gatewayName": {
-            "value": "azureGateway"
+            "value": "Gateway"
         },
         "connectionName": {
             "value": "azureVpnConnection"
         },
         "sharedKey": {
-            "value": "ABCDEFGHJKILMNOP1234567890"
+            "value": "ABCDEFGHJKLMNOP12345678"
         }
     }
 }

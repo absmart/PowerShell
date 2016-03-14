@@ -111,11 +111,16 @@
         },
         "gatewaySku":{
             "type":"string",
-            "defaultValue": "Basic",
             "metadata":{
-                "description":"The Sku of the Gateway. This must be one of Basic, Standard or HighPerformance."
-            }
-      },
+              "description":"The Sku of the Gateway. This must be one of Basic, Standard or HighPerformance."
+            },
+            "defaultValue": "Basic",
+            "allowedValues": [
+              "Basic",
+              "Standard",
+              "HighPerformance"
+            ]
+          },
         "connectionName": {
             "type": "string",
             "defaultValue": "Azure2Other",
