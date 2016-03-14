@@ -1,5 +1,5 @@
 ﻿Set-Location "D:\Users\ABS\Deployment"
-$apikey = "API-LEJYJLZT3SWXEGB5PHONIKQGLE"
+$apikey = "API-ABCDEFGH"
 
 $pkgs = Get-ChildItem .\pkg -Recurse
 foreach($pkg in $pkgs)
