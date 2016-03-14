@@ -12,11 +12,16 @@
     $DeploymentName
 )
 
-try{Get-AzureRmSubscription}
-catch{Login-AzureRmAccount}
+try{ Get-AzureRmSubscription | Out-Null }
+catch{ Login-AzureRmAccount }
 
-try{Get-AzureRMResourceGroup -Name $ResourceGroup -Location $Location}
-catch{New-AzureRMResourceGroup -Name $ResourceGroup -Location $Location}
+try{
+    Get-AzureRMResourceGroup -Name $ResourceGroup -Location $Location | Out-Null
+}
+catch{
+    Write-Host "$ResourceGroupName - Group not found! Creating new group" -ForegroundColor Yellow;
+    New-AzureRMResourceGroup -Name $ResourceGroup -Location $Location
+}
 
 if(!($DeploymentName)){
     $DeploymentName = $ResourceGroup + "-deployment"
