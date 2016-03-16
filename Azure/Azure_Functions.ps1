@@ -1,6 +1,10 @@
 ﻿Import-Module (Join-Path $env:POWERSHELL_HOME "\Azure\Azure_Variables.psm1")
-Import-Module Azure
-Add-AzureAccount
+
+function Load-AzureRM{        
+    try{Get-AzureRmSubscription}
+    catch{Login-AzureRmAccount}
+}
+New-Alias -Name arm -Value Load-AzureRM
 
 function ConnectTo-AzureInstance {
     param(
@@ -18,6 +22,12 @@ function ConnectTo-AzureInstance {
     }
     Add-AzureAccount -Credential
 }
+
+function ConnectTo-MsolService {
+    $msolCred = Get-Credential
+    Connect-MsolService -Credential $msolCred
+}
+New-Alias -Name aad -Value ConnectTo-MsolService
 
 function Get-AzureImageName {
     param(
@@ -86,5 +96,3 @@ function New-AzureVmWindows {
     $AzureVM | Add-AzureProvisioningConfig -Windows -AdminUsername $AdminUsername -Password $AdminPassword -Verbose
     $AzureVM | New-AzureVM -ServiceName $LabName -Location $Location -Verbose -AffinityGroup $LabName
 }
-
-New-AzureVmWindows -VmName "" -AdminUsername alex -AdminPassword ""
