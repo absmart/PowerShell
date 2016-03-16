@@ -23,10 +23,10 @@ foreach($job in $jobName){
     $jobErrorMessage = $status.ErrorMessage
 
     if($jobErrorMessage -eq $null){
-        [system.string] $jobStatus = ""
+        [system.string] $jobStatus = $status.Status
     }
     else{
-        [system.string] $jobError = $jobErrorMessage
+        [system.string] $JobStatus = $jobErrorMessage
     }
 
     # Return results to host for PRTG to capture
@@ -35,6 +35,8 @@ foreach($job in $jobName){
     "<result>"
     "<channel>$jobName</channel>"
     "<value>$jobStatus</value>"
+ 
+    "<text></text>" # add text here
     "</result>"
     "</prtg>"
 }

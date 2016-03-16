@@ -34,17 +34,16 @@ foreach($source in $sources){
         return $status
     }
 
-    $crawlState = $status.ContentSource.CrawlSchedule
-    $crawlErrorCount = $status.ContentSource.CrawlStatus
+    $crawlState = $status.ContentSource.CrawlStatus
     $crawlLevelHighErrorCount = $status.LevelHighErrorCount
-    $fullCrawlErrorCount = $status.ContentSource.LevelHighErrorCount
 
     # Return results to host for PRTG to capture
 
     Write-Host "<prtg>"
     "<result>"
     "<channel>crawlState</channel>"
-    "<value>$crawlState</value>"
+    "<value>$crawlState</value>" # need to update this to integer only
+    "<text></text>" # add text here
     "</result>"
     "</prtg>"
 
@@ -52,6 +51,7 @@ foreach($source in $sources){
     "<result>"
     "<channel>crawlLevelHighErrorCount</channel>"
     "<value>$crawlLevelHighErrorCount</value>"
+    "<text></text>" # add text here
     "</result>"
     "</prtg>"
 }
