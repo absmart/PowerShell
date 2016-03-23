@@ -1,0 +1,16 @@
+{
+    "Name": "Website Production Contributor",
+    "Id": "23d927b6-1434-4087-af98-be6d5e779e39",
+    "IsCustom": true,
+    "Description": "Can manage Production and Production-Staging deployment slots for WebApps.",
+    "Actions": [
+        "Microsoft.Support/*",
+        "Microsoft.Web/listSitesAssignedToHostName/read",
+        "Microsoft.Web/serverFarms/join/action",
+        "Microsoft.Web/serverFarms/read",
+        "Microsoft.Web/sites/*",
+    ],
+    "NotActions": [
+    ],
+    "AssignableScopes": ["/subscriptions/9657e474-3cb8-4841-91e0-a77c2c53f526/resourceGroups/WebApps/providers/Microsoft.Web/sites/TemplateBase/"]
+}

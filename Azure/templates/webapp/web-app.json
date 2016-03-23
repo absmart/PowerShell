@@ -1,0 +1,119 @@
+{
+   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+   "contentVersion": "1.0.0.0",
+   "parameters": {
+    "siteName": {
+        "type": "string",
+        "metadata": {
+            "description": "The name of the web app that you wish to create."
+        }
+        },
+          "hostingPlanName": {
+            "type": "string",
+            "metadata": {
+              "description": "The name of the App Service plan to use for hosting the web app."
+            }
+        },
+          "siteLocation": {
+            "type": "string",
+            "metadata": {
+              "description": "The location to use for creating the web app and hosting plan."
+            }
+          },
+        "sku": {
+        "type": "string",
+        "allowedValues": [
+            "Free",
+            "Shared",
+            "Basic",
+            "Standard"
+        ],
+        "defaultValue": "Free",
+        "metadata": {
+          "description": "The pricing tier for the hosting plan."
+        }
+    },
+    "workerSize": {
+      "type": "string",
+      "allowedValues": [
+        "0",
+        "1",
+        "2"
+      ],
+      "defaultValue": "0",
+      "metadata": {
+        "description": "The instance size of the hosting plan (small, medium, or large)."
+      }
+   }
+    },
+   "resources": [
+     {
+       "apiVersion": "2015-01-01",
+       "type": "Microsoft.Web/serverfarms",
+       "name": "[parameters('hostingPlanName')]",
+       "location": "[resourceGroup().location]",
+       "properties": {
+         "name": "[parameters('hostingPlanName')]",
+         "sku": "[parameters('hostingPlanSku')]",
+         "workerSize": "0",
+         "numberOfWorkers": 1
+       }
+     },
+     {
+       "apiVersion": "2014-06-01",
+       "type": "Microsoft.Web/sites",
+       "name": "[parameters('siteName')]",
+       "location": "[resourceGroup().location]",
+       "tags": {
+         "environment": "test",
+         "team": "ARM"
+       },
+       "dependsOn": [
+         "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
+       ],
+       "properties": {
+         "name": "[parameters('siteName')]",
+         "serverFarm": "[parameters('hostingPlanName')]"
+       },
+       "resources": [
+         {
+           "apiVersion": "2014-06-01",
+           "type": "Extensions",
+           "name": "MSDeploy",
+           "dependsOn": [
+             "[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
+           ],
+           "properties": {
+             "packageUri": "https://auxmktplceprod.blob.core.windows.net/packages/StarterSite-modified.zip",
+             "dbType": "None",
+             "connectionString": "",
+             "setParameters": {
+               "Application Path": "[parameters('siteName')]"
+             }
+           }
+         },
+         {
+            "apiVersion": "2014-06-01",
+            "name": "[parameters('siteName')]",
+            "type": "Microsoft.Insights/components",
+            "location": "Central US",
+            "dependsOn": [
+                "[concat('Microsoft.Web/sites/', parameters('siteName'))]"
+            ],
+            "tags": {
+                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('siteName'))]": "Resource"
+            },
+            "properties": {
+                "ApplicationId": "[parameters('siteName')]"
+            }
+        }
+       ]
+     }
+   ],
+   "outputs": {
+     "siteUri": {
+       "type": "string",
+       "value": "[concat('http://',reference(resourceId('Microsoft.Web/sites', parameters('siteName'))).hostNames[0])]"
+     }
+   }
+}

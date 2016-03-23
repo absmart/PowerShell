@@ -1,6 +1,6 @@
 # https://azure.microsoft.com/en-us/documentation/articles/web-sites-staged-publishing/
 
-$WebAppName = "AzureWebAppTest"
+$WebAppName = "fAzureWebAppTest"
 $WebAppResourceGroupName = "WebApp"
 $AzureNetworkResourceGroupName = "AzureNetwork"
 $Location = "northcentralus"
@@ -22,6 +22,8 @@ $WebApp = New-AzureRmWebApp -ResourceGroupName $rgWebApp.ResourceGroupName -Name
 # Create a deployment slot for a web app
 New-AzureRmWebAppSlot -ResourceGroupName $rgWebApp.ResourceGroupName -Name $WebAppName -Slot "Development" -AppServicePlan $ServicePlan.Name
 New-AzureRmWebAppSlot -ResourceGroupName $rgWebApp.ResourceGroupName -Name $WebAppName -Slot "Staging" -AppServicePlan $ServicePlan.Name
+New-AzureRmWebAppSlot -ResourceGroupName $rgWebApp.ResourceGroupName -Name $WebAppName -Slot "ProductionBlue" -AppServicePlan $ServicePlan.Name
+New-AzureRmWebAppSlot -ResourceGroupName $rgWebApp.ResourceGroupName -Name $WebAppName -Slot "ProductionGreen" -AppServicePlan $ServicePlan.Name
 
 # Create a new Traffic Manager profile and assign to site
 $TmProfile = New-AzureRmTrafficManagerProfile -Name $WebAppName `

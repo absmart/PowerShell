@@ -1,0 +1,26 @@
+{
+   "id": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+   "contentVersion": "1.0.0.0",
+   "title": "Application Insights",
+   "description": "An Azure deployment template for Application Insights.",   
+   "parameters": {
+        "applicationInsightsName" : {
+            "type" : "string",
+            "defaultValue": "ApplicationInsights",          
+            "metadata": {
+                "description": "The name of the Application Insights object." 
+            }
+        }
+    },
+   "variables": {  
+       "type": "object",
+       "description": "Variable definitions go here"
+   },
+   "resources": [  
+       {
+        "name": "[parameters('applicationInsightsName')]",
+        "type": "microsoft.insights/components",
+        "location": "Central US"
+       }
+   ]
+}

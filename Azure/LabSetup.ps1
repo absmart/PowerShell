@@ -2,7 +2,7 @@
 
 # Sandbox setup
 
-$rgName = "absSandbox"
+$rgName = "ABSVirtualNetwork"
 $location = "northcentralus"
 
 $vNetName = "absvNet"
@@ -37,7 +37,7 @@ foreach($vm in ("absVm1","absVm2")){
     $storageType = "Standard_LRS"
     $osDiskName = $vmName + "osDisk"
     $storageAccount = New-AzureRmStorageAccount -ResourceGroupName $rgName -Name ($vmName + "storage1") -Type $storageType -Location $location
-    
+
     # Network
     $publicIp = New-AzureRmPublicIpAddress -Name $InterfaceName -ResourceGroupName $ResourceGroupName -Location $Location -AllocationMethod Dynamic
     $subnetConfig = New-AzureRmVirtualNetworkSubnetConfig -Name $Subnet1Name -AddressPrefix $VNetSubnetAddressPrefix
