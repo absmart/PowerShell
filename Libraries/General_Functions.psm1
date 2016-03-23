@@ -99,7 +99,7 @@ function Get-InstalledDotNetVersions
             Select  -Unique -Expand Version
         )
     }
-    else{ 
+    else{
         Invoke-Command -ComputerName $ComputerName -ScriptBlock {
             $Path = 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP'
             return (
@@ -198,9 +198,9 @@ function Disable-UserAccessControl
     }
     else{
         Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-            Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 00000000            
+            Set-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 00000000
         }
-        Write-Verbose "$Computername - User Access Control (UAC) has been disabled." 
+        Write-Verbose "$Computername - User Access Control (UAC) has been disabled."
     }
 }
 
@@ -406,13 +406,13 @@ function Import-PfxCertificate
 		[String] $CertStore = "My",
         [object] $PfxPass = $null,
         [pscredential] $Credential
-    )	
+    )
 
     if ($pfxPass -eq $null)
 	{
 		$PfxPass = read-host "Enter the pfx password" -assecurestring
 	}
-    
+
     if($ComputerName){
         Invoke-Command -ComputerName $ComputerName -ArgumentList $CertPath,$CertRootStore,$CertStore,$PfxPass -ScriptBlock{
             param(
@@ -560,7 +560,7 @@ function Get-WindowsUpdateConfiguration
 
 function Get-SystemGAC
 {
-    param( 
+    param(
         [string[]] $ComputerName
     )
 
@@ -1060,13 +1060,24 @@ function Get-ServiceDetail
     )
     foreach($Computer in $ComputerName){
         if($NotSystemUser){
-            Get-WmiObject -Class Win32_Service -ComputerName $Computer -Filter "Name like '%$Name%'" | 
-                Where-Object {$_.StartName -notmatch 'LocalSystem' -and $_.StartName -notmatch 'NetworkService' -and $_.StartName -notmatch 'LocalService'} | 
+            Get-WmiObject -Class Win32_Service -ComputerName $Computer -Filter "Name like '%$Name%'" |
+                Where-Object {$_.StartName -notmatch 'LocalSystem' -and $_.StartName -notmatch 'NetworkService' -and $_.StartName -notmatch 'LocalService'} |
                 Select PSComputerName, DisplayName, Name, StartName, State, Description, PathName, ProcessId, ServiceType
         }
         else{
-            Get-WmiObject -Class Win32_Service -ComputerName $Computer -Filter "Name like '%$Name%'" | 
+            Get-WmiObject -Class Win32_Service -ComputerName $Computer -Filter "Name like '%$Name%'" |
                 Select PSComputerName, DisplayName, Name, StartName, State, Description, PathName, ProcessId, ServiceType
         }
     }
+}
+
+function Create-SecureCredential
+{
+	param(
+		$Username,
+		$Password
+	)
+	$securePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force
+	$Credential = New-Object System.Management.Automation.PSCredential ($Username, $securePassword)
+	return $Credential
 }
