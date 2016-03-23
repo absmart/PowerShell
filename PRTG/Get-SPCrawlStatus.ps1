@@ -7,7 +7,7 @@
 $securePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force
 $Credential = New-Object System.Management.Automation.PSCredential ($Username, $securePassword)
 
-$sources = Invoke-Command -ComputerName $ComputerName -Credential $Credential -ScriptBlock {
+$sources = Invoke-Command -ComputerName $ComputerName -Credential $Credential -Authentication Credssp -ScriptBlock {
     Add-PSSnapin Microsoft.SharePoint.PowerShell
 
     $searchApp = Get-SPServiceApplication | Where-Object {$_.DisplayName -eq "Search Service Application"}
@@ -22,7 +22,7 @@ $sources = Invoke-Command -ComputerName $ComputerName -Credential $Credential -S
 
 foreach($source in $sources){
 
-    $status = Invoke-Command -ComputerName $ComputerName -Credential $Credential -ArgumentList $source -ScriptBlock {
+    $status = Invoke-Command -ComputerName $ComputerName -Credential $Credential -Authentication Credssp -ArgumentList $source -ScriptBlock {
         param(
             $source
         )
@@ -34,24 +34,24 @@ foreach($source in $sources){
         return $status
     }
 
-    $crawlState = $status.ContentSource.CrawlStatus
+    if($status.ContentSource.CrawlStatus -ne $null)
+    {
+        $crawlState = $status.ContentSource.CrawlStatus
+    }
+    else { $crawlState = 0 }
     $crawlLevelHighErrorCount = $status.LevelHighErrorCount
 
     # Return results to host for PRTG to capture
 
-    Write-Host "<prtg>"
-    "<result>"
-    "<channel>crawlState</channel>"
-    "<value>$crawlState</value>" # need to update this to integer only
-    "<text></text>" # add text here
-    "</result>"
-    "</prtg>"
-
-    Write-Host "<prtg>"
-    "<result>"
-    "<channel>crawlLevelHighErrorCount</channel>"
-    "<value>$crawlLevelHighErrorCount</value>"
-    "<text></text>" # add text here
-    "</result>"
+    "<prtg>"
+        "<result>"
+            "<channel>crawlState</channel>"
+            "<value>$crawlState</value>"
+        "</result>"
+        
+        "<result>"
+            "<channel>crawlLevelHighErrorCount</channel>"
+            "<value>$crawlLevelHighErrorCount</value>"
+        "</result>"
     "</prtg>"
 }
