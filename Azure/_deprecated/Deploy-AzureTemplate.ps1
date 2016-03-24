@@ -3,7 +3,6 @@
     $TemplateFile,
     [Parameter(ParameterSetName='TemplateFile')]
     $ParameterFile,
-
     [Parameter(ParameterSetName='TemplateUri')]
     $TemplateUri,
 

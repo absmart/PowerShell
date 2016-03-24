@@ -8,6 +8,8 @@
 $securePassword = ConvertTo-SecureString -String $Password -AsPlainText -Force
 $Credential = New-Object System.Management.Automation.PSCredential ($Username, $securePassword)
 
+    Write-Host "<prtg>"
+
 foreach($job in $jobName){
 
     $status = Invoke-Command -ComputerName $ComputerName -Credential $Credential -ArgumentList $JobName -ScriptBlock {
@@ -31,12 +33,14 @@ foreach($job in $jobName){
 
     # Return results to host for PRTG to capture
 
-    Write-Host "<prtg>"
+
     "<result>"
     "<channel>$jobName</channel>"
     "<value>$jobStatus</value>"
  
     "<text></text>" # add text here
     "</result>"
-    "</prtg>"
+
 }
+
+    "</prtg>"

@@ -62,37 +62,3 @@ function Get-AzureRdp {
 
     Start-Process "mstsc" -ArgumentList "/V:$HostDns`:$Port /w:1024 /h:768"
 }
-
-function Setup-AzureLab {
-    param(
-        $Location = "Central US",
-        $LabName,
-        $StoageAccountName,
-        $AutomationAccountName
-    )
-
-    New-AzureAffinityGroup -Name $LabName
-    New-AzureStorageAccount -StorageAccountName $StoageAccountName -AffinityGroup $LabName
-    New-AzureService -ServiceName $LabName -Location $Location
-    New-AzureAutomationAccount -Name $AutomationAccountName -Location $Location
-}
-
-function New-AzureVmWindows {
-    param(
-        $VmName,
-        $VmSize = "Standard_DS1",
-        $Image = $azure.images.windows2012r2,
-        $AdminUsername,
-        $AdminPassword,
-        $Location = "Central US",
-        $LabName,
-        $VnetName,
-        $StorageAccountName,
-        $AutomationAccountName
-    )
-
-    $AzureVM = New-AzureVMConfig -Name $VmName -InstanceSize $VmSize -ImageName $Image -Verbose
-    $AzureVM = New-AzureVMConfig -Name $VmName -InstanceSize $VmSize -ImageName $Image -Verbose
-    $AzureVM | Add-AzureProvisioningConfig -Windows -AdminUsername $AdminUsername -Password $AdminPassword -Verbose
-    $AzureVM | New-AzureVM -ServiceName $LabName -Location $Location -Verbose -AffinityGroup $LabName
-}

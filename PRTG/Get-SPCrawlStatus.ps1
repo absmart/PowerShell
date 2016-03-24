@@ -20,6 +20,8 @@ $sources = Invoke-Command -ComputerName $ComputerName -Credential $Credential -A
     return $sources
 }
 
+    "<prtg>"
+
 foreach($source in $sources){
 
     $status = Invoke-Command -ComputerName $ComputerName -Credential $Credential -Authentication Credssp -ArgumentList $source -ScriptBlock {
@@ -43,7 +45,7 @@ foreach($source in $sources){
 
     # Return results to host for PRTG to capture
 
-    "<prtg>"
+
         "<result>"
             "<channel>crawlState</channel>"
             "<value>$crawlState</value>"
@@ -53,5 +55,7 @@ foreach($source in $sources){
             "<channel>crawlLevelHighErrorCount</channel>"
             "<value>$crawlLevelHighErrorCount</value>"
         "</result>"
-    "</prtg>"
+
 }
+
+    "</prtg>"
