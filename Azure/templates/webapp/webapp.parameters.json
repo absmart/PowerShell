@@ -1,24 +1,54 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "siteName": {
-            "value": "CoverdellWebApp1"
-        },
-        "hostingPlanName": {
-            "value": "WebApps"
-        },
-        "hostingPlanSku": {
-            "value": "Standard"
-        },
-        "workerSize": {
-            "value": "0"
-        },
-        "numberOfWorkers": {
-            "value": "2"
-        },
-        "applicationInsightsName": {
-            "value": "CoverdellAppInsights"
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "siteName": {
+      "value": "ExampleWebAppName",
+      "metadata": {
+        "description": "Sets the domain name prefix for the web app. The concatenation of the domain name and the regionalized DNS zone make up the full A record of the web app."
+      }
+    },
+    "hostingPlanName": {
+      "value": "ExamplePlanName",
+      "metadata": {
+        "description": "Sets the hosting plan name prefix for the web app. The concatenation of the service plan name and the region make up the full name of the plan."
+      }
+    },
+    "hostingPlanSize": {
+      "value": "Standard",
+      "metadata": {
+        "description": "Set the hosting type for the web app service plan. Accepted values are Standard and Premium."
+      }
+    },
+    "workerSize": {
+      "value": 0,
+      "metadata": {
+        "description": "Set the performance level of the service plan. Accepts values 0, 1 or 2."
+      }
+    },
+    "numberOfWorkers": {
+      "value": 1,
+      "metadata": {
+        "description": "The number of web instances for the service plan. This value can be from 1 to 10."
+      }
+    },
+    "applicationInsightsName": {
+      "value": "ExampleAppInsightsName",
+      "metadata": {
+        "description": "Enter a name used by the web app for Application Insights."
+      }
+    },
+    "productionSlotName": {
+      "value": "production"
+    },
+    "stagingSlotName": {
+      "value": "staging"
+    },
+    "storageAccountName": {
+      "value": "ExampleStorageAccountName",
+      "metadata": {
+        "description": "Enter a globally-unique name for the storage account. Must be between 3 and 24 characters long."
+      }
     }
+  }
 }

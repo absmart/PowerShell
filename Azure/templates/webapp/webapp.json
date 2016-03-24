@@ -1,85 +1,272 @@
 {
-   "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-   "contentVersion": "1.0.0.0",
-   "parameters": {
-     "siteName": {
-       "type": "string"
-     },
-     "hostingPlanName": {
-       "type": "string"
-     },
-     "hostingPlanSku": {
-       "type": "string",
-       "allowedValues": [
-         "Free",
-         "Shared",
-         "Basic",
-         "Standard",
-         "Premium"
-       ],
-       "defaultValue": "Standard"
-     },
-     "workerSize": {
-       "type": "string",
-       "allowedValues":[
-           "0",
-           "1",
-           "2"
-       ],
-       "defaultValue": "0"
-     },
-     "numberOfWorkers": {
-         "type": "string",
-         "allowedValues": [
-            "0",
-            "1",
-            "2",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "10"
-         ],
-         "defaultValue": "1"         
-     },
-     "applicationInsightsName": {
-         "type": "string",
-         "defaultValue": "ApplicationInsights"
-     }
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "siteName": {
+      "type": "string",
+      "defaultValue": "absswcDemoApp",
+      "metadata": {
+        "description": "Sets the domain name prefix for the web app. The concatenation of the domain name and the regionalized DNS zone make up the full A record of the web app."
+      }
     },
-   "resources": [
-     {
-       "apiVersion": "2014-06-01",
-       "type": "Microsoft.Web/serverfarms",
-       "name": "[parameters('hostingPlanName')]",
-       "location": "[resourceGroup().location]",
-       "properties": {
-         "name": "[parameters('hostingPlanName')]",
-         "sku": "[parameters('hostingPlanSku')]",
-         "workerSize": "[parameters('workerSize')]",
-         "numberOfWorkers": "[parameters('numberOfWorkers')]"
-       }
-     },
-     {
-       "apiVersion": "2014-06-01",
-       "type": "Microsoft.Web/sites",
-       "name": "[parameters('siteName')]",
-       "location": "[resourceGroup().location]",
-       "tags": {
-         "environment": "test",
-         "team": "ARM"
-       },
-       "dependsOn": [
-         "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
-       ],
-       "properties": {
-         "name": "[parameters('siteName')]",
-         "serverFarm": "[parameters('hostingPlanName')]"
-       }
-     },
-     {
+    "hostingPlanName": {
+      "type": "string",
+      "defaultValue": "absPlan",
+      "metadata": {
+        "description": "Sets the hosting plan name prefix for the web app. The concatenation of the service plan name and the region make up the full name of the plan."
+      }
+    },
+    "hostingPlanSize": {
+      "type": "string",
+      "allowedValues": [
+        "Standard",
+        "Premium"
+      ],
+      "defaultValue": "Standard",
+      "metadata": {
+        "description": "Set the hosting type for the web app service plan."
+      }
+    },
+    "workerSize": {
+      "type": "int",
+      "minValue": 0,
+      "maxValue": 2,
+      "defaultValue": 0,
+      "metadata": {
+        "description": "Set the performance level of the service plan. Accepts values 0, 1 or 2."
+      }
+    },
+    "numberOfWorkers": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "maxValue": 10,
+      "metadata": {
+        "description": "The number of web instances for the service plan. This value can be from 1 to 10."
+      }
+    },
+    "applicationInsightsName": {
+      "type": "string",
+      "defaultValue": "ApplicationInsights",
+      "metadata": {
+        "description":  "Enter a name used by the web app for Application Insights."
+      }
+    },
+    "productionSlotName": {
+      "type": "string",
+      "defaultValue": "production"
+    },
+    "stagingSlotName": {
+      "type": "string",
+      "defaultValue": "staging"
+    },
+    "storageAccountName": {
+      "type": "string",
+      "minLength": "3",
+      "maxLength": "24",
+      "defaultValue": "absswcdemoapp",
+      "metadata": {
+        "description": "Enter a globally-unique name for the storage account. Must be between 3 and 24 characters long."
+      }
+    }
+  },
+  "variables": {
+    "webAppName": "[concat(parameters('siteName'), '-', resourceGroup().location)]",
+    "hostingPlanName": "[concat(parameters('hostingPlanName'), '-', resourcegroup().location)]",
+    "productionSlotName": "production",
+    "stagingSlotName": "staging",
+    "applicationInsightsName": "[concat(parameters('siteName'), '-', resourcegroup().location)]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-06-15",
+      "name": "[toLower(parameters('storageAccountName'))]",
+      "location": "[resourceGroup().location]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "properties": {
+        "accountType": "Standard_LRS"
+      }
+    },
+    {
+      "apiVersion": "2015-04-01",
+      "name": "[parameters('hostingPlanName')]",
+      "type": "Microsoft.Web/serverFarms",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "name": "[parameters('hostingPlanName')]",
+        "sku": "[parameters('hostingPlanSize')]",
+        "workerSize": "[parameters('workerSize')]",
+        "numberOfWorkers": "[parameters('numberOfWorkers')]"
+      }
+    },
+    {
+      "apiVersion": "2015-04-01",
+      "name": "[parameters('siteName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverFarms', parameters('hostingPlanName'))]"
+      ],
+      "properties": {
+        "serverFarmId": "[parameters('hostingPlanName')]"
+      },
+      "resources": [
+        {
+          "apiVersion": "2015-04-01",
+          "name": "appsettings",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+          ],
+          "properties": {
+            "clientUrl": "[concat('http://', reference(resourceId('Microsoft.Web/Sites', parameters('siteName'))).hostNames[0])]"
+          }
+        },
+        {
+          "apiVersion": "2015-04-01",
+          "name": "slotconfignames",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+          ],
+          "properties": {
+            "appSettingNames": [
+              "clientUrl",
+              "PROJECT",
+              "Environment"
+            ],
+            "connectionStringNames": [
+              "MultiChannelToDoContext"
+            ]
+          }
+        },
+        {
+          "apiVersion": "2015-04-01",
+          "name": "[parameters('productionSlotName')]",
+          "type": "slots",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+          ],
+          "properties": { },
+          "resources": [
+            {
+              "apiVersion": "2015-04-01",
+              "name": "appsettings",
+              "type": "config",
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/Sites/Slots', parameters('siteName'), parameters('productionSlotName'))]"
+              ],
+              "properties": {
+                "Environment": "Production",
+                "clientUrl": "[concat('http://', reference(resourceId('Microsoft.Web/Sites/Slots', parameters('siteName'), parameters('productionSlotName'))).hostNames[0])]"
+              }
+            },
+            {
+              "apiVersion": "2015-04-01",
+              "name": "connectionstrings",
+              "type": "config",
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/Sites/Slots', parameters('siteName'), parameters('productionSlotName'))]"
+              ],
+              "properties": {
+                "MultiChannelToDoContext": {
+                  "value": "ProductionTestValue",
+                  "type": "SQLAzure"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "apiVersion": "2015-04-01",
+          "name": "[parameters('stagingSlotName')]",
+          "type": "slots",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+          ],
+          "properties": { },
+          "resources": [
+            {
+              "apiVersion": "2015-04-01",
+              "name": "appsettings",
+              "type": "config",
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/Sites/Slots', parameters('siteName'), parameters('stagingSlotName'))]"
+              ],
+              "properties": {
+                "Environment": "Staging",
+                "clientUrl": "[concat('http://', reference(resourceId('Microsoft.Web/Sites/Slots', parameters('siteName'), parameters('stagingSlotName'))).hostNames[0])]"
+              }
+            },
+            {
+              "apiVersion": "2015-04-01",
+              "name": "connectionstrings",
+              "type": "config",
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/Sites/Slots', parameters('siteName'), parameters('stagingSlotName'))]"
+              ],
+              "properties": {
+                "MultiChannelToDoContext": {
+                  "value": "StagingTestValueStaging",
+                  "type": "SQLAzure"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "[concat('autoscale-', parameters('hostingPlanName'), '-', resourceGroup().name)]",
+      "type": "Microsoft.Insights/autoscalesettings",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2014-04-01",
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
+      ],
+      "tags": {
+        "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]": "Resource"
+      },
+      "properties": {
+        "name": "[concat('autoscale-', parameters('hostingPlanName'), '-', resourceGroup().name)]",
+        "profiles": [
+          {
+            "name": "Default",
+            "capacity": {
+              "minimum": 2,
+              "maximum": 2,
+              "default": 2
+            },
+            "rules": [
+              {
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricNamespace": "",
+                  "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Web/Sites/', parameters('siteName'))]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT10M",
+                  "timeAggregation": "Average",
+                  "operator": "GreaterThan",
+                  "threshold": 90
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": 1,
+                  "cooldown": "PT5M"
+                }
+              }
+            ]
+          }
+        ],
+        "enabled": true,
+        "targetResourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
+      }
+    },
+    {
       "apiVersion": "2014-04-01",
       "name": "[parameters('applicationInsightsName')]",
       "type": "Microsoft.Insights/components",
@@ -93,12 +280,35 @@
       "properties": {
         "ApplicationId": "[parameters('siteName')]"
       }
+    },
+    {
+      "apiVersion": "2015-04-28-preview",
+      "name": "[parameters('siteName')]",
+      "type": "Microsoft.Network/trafficManagerProfiles",
+      "location": "global",
+      "properties": {
+        "profileStatus": "Enabled",
+        "trafficRoutingMethod": "Performance",
+        "dnsConfig": {
+          "relativeName": "[parameters('siteName')]",
+          "ttl": 300
+        },
+        "monitorConfig": {
+          "protocol": "HTTP",
+          "port": 80,
+          "path": "/"
+        },
+        "endpoints": {
+          "name": "[concat(parameters('siteName'), '-', resourceGroup().location)]",
+          "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
+          "properties": {
+            "endpointStatus": "Enabled",
+            "target": "absdemowebsite.azurewebsites.net",
+            "weight": 1,
+            "priority": 1
+          }
+        }
+      }
     }
-   ],
-   "outputs": {
-     "siteUri": {
-       "type": "string",
-       "value": "[concat('http://',reference(resourceId('Microsoft.Web/sites', parameters('siteName'))).hostNames[0])]"
-     }
-   }
+  ]
 }
