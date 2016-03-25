@@ -71,6 +71,7 @@
     }
   },
   "variables": {
+    "apiVersion": "2015-04-01",
     "webAppName": "[concat(parameters('siteName'), '-', resourceGroup().location)]",
     "hostingPlanName": "[concat(parameters('hostingPlanName'), '-', resourcegroup().location)]",
     "productionSlotName": "production",
@@ -88,7 +89,7 @@
       }
     },
     {
-      "apiVersion": "2015-04-01",
+      "apiVersion": "[variables('apiVersion')]",
       "name": "[parameters('hostingPlanName')]",
       "type": "Microsoft.Web/serverFarms",
       "location": "[resourceGroup().location]",
@@ -100,7 +101,7 @@
       }
     },
     {
-      "apiVersion": "2015-04-01",
+      "apiVersion": "[variables('apiVersion')]",
       "name": "[parameters('siteName')]",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
@@ -112,7 +113,7 @@
       },
       "resources": [
         {
-          "apiVersion": "2015-04-01",
+          "apiVersion": "[variables('apiVersion')]",
           "name": "appsettings",
           "type": "config",
           "dependsOn": [
@@ -123,7 +124,7 @@
           }
         },
         {
-          "apiVersion": "2015-04-01",
+          "apiVersion": "[variables('apiVersion')]",
           "name": "slotconfignames",
           "type": "config",
           "dependsOn": [
@@ -141,7 +142,7 @@
           }
         },
         {
-          "apiVersion": "2015-04-01",
+          "apiVersion": "[variables('apiVersion')]",
           "name": "[parameters('productionSlotName')]",
           "type": "slots",
           "location": "[resourceGroup().location]",
@@ -151,7 +152,7 @@
           "properties": { },
           "resources": [
             {
-              "apiVersion": "2015-04-01",
+              "apiVersion": "[variables('apiVersion')]",
               "name": "appsettings",
               "type": "config",
               "dependsOn": [
@@ -163,7 +164,7 @@
               }
             },
             {
-              "apiVersion": "2015-04-01",
+              "apiVersion": "[variables('apiVersion')]",
               "name": "connectionstrings",
               "type": "config",
               "dependsOn": [
@@ -179,7 +180,7 @@
           ]
         },
         {
-          "apiVersion": "2015-04-01",
+          "apiVersion": "[variables('apiVersion')]",
           "name": "[parameters('stagingSlotName')]",
           "type": "slots",
           "location": "[resourceGroup().location]",
@@ -189,7 +190,7 @@
           "properties": { },
           "resources": [
             {
-              "apiVersion": "2015-04-01",
+              "apiVersion": "[variables('apiVersion')]",
               "name": "appsettings",
               "type": "config",
               "dependsOn": [
@@ -201,7 +202,7 @@
               }
             },
             {
-              "apiVersion": "2015-04-01",
+              "apiVersion": "[variables('apiVersion')]",
               "name": "connectionstrings",
               "type": "config",
               "dependsOn": [
@@ -222,7 +223,7 @@
       "name": "[concat('autoscale-', parameters('hostingPlanName'), '-', resourceGroup().name)]",
       "type": "Microsoft.Insights/autoscalesettings",
       "location": "[resourceGroup().location]",
-      "apiVersion": "2014-04-01",
+      "apiVersion": "[variables('apiVersion')]",
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
       ],
@@ -267,7 +268,7 @@
       }
     },
     {
-      "apiVersion": "2014-04-01",
+      "apiVersion": "[variables('apiVersion')]",
       "name": "[parameters('applicationInsightsName')]",
       "type": "Microsoft.Insights/components",
       "location": "Central US",
