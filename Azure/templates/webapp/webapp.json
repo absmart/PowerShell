@@ -72,15 +72,19 @@
   },
   "variables": {
     "apiVersion": "2015-04-01",
+    "trafficManagerApiVersion": "2015-04-28-preview",
+    "storageAccountApiVersion": "2015-06-15",
+    "applicationInsightsApiVersion": "2014-04-01",
     "webAppName": "[concat(parameters('siteName'), '-', resourceGroup().location)]",
     "hostingPlanName": "[concat(parameters('hostingPlanName'), '-', resourcegroup().location)]",
     "productionSlotName": "production",
     "stagingSlotName": "staging",
-    "applicationInsightsName": "[concat(parameters('siteName'), '-', resourcegroup().location)]"
+    "applicationInsightsName": "[concat(parameters('siteName'), '-', resourcegroup().location)]",
+    "storageAccountId": "[concat(resourceGroup().id,'/providers/Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
   },
   "resources": [
     {
-      "apiVersion": "2015-06-15",
+      "apiVersion": "[variables('storageAccountApiVersion')]",
       "name": "[toLower(parameters('storageAccountName'))]",
       "location": "[resourceGroup().location]",
       "type": "Microsoft.Storage/storageAccounts",
@@ -268,7 +272,7 @@
       }
     },
     {
-      "apiVersion": "[variables('apiVersion')]",
+      "apiVersion": "[variables('applicationInsightsApiVersion')]",
       "name": "[parameters('applicationInsightsName')]",
       "type": "Microsoft.Insights/components",
       "location": "Central US",
@@ -283,10 +287,13 @@
       }
     },
     {
-      "apiVersion": "2015-04-28-preview",
+      "apiVersion": "[variables('trafficManagerApiVersion')]",
       "name": "[parameters('siteName')]",
       "type": "Microsoft.Network/trafficManagerProfiles",
       "location": "global",
+      "dependsOn": [
+        "[concat('Microsoft.Web/sites/', parameters('siteName'))]"
+      ],
       "properties": {
         "profileStatus": "Enabled",
         "trafficRoutingMethod": "Performance",
@@ -299,17 +306,33 @@
           "port": 80,
           "path": "/"
         },
-        "endpoints": {
-          "name": "[concat(parameters('siteName'), '-', resourceGroup().location)]",
-          "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
-          "properties": {
-            "endpointStatus": "Enabled",
-            "target": "absdemowebsite.azurewebsites.net",
-            "weight": 1,
-            "priority": 1
+        "endpoints": [
+          {
+            "name": "[concat(parameters('siteName'), '-', resourceGroup().location)]",
+            "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
+            "properties": {
+              "endpointStatus": "Enabled",
+              "targetResourceId": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Web/Sites/', parameters('siteName'))]",
+              "weight": 1,
+              "priority": 1
+            }
           }
-        }
+        ]
       }
     }
-  ]
+  ],
+  "outputs": {
+      "siteUri": {
+        "type": "string",
+        "value": "[concat('http://',reference(resourceId('Microsoft.Web/sites', parameters('siteName'))).hostNames[0])]"
+      },
+      "keyString": {
+        "type": "string",
+        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',concat(listKeys(variables('storageAccountId'),'2015-05-01-preview').key1))]"
+      },
+      "Key": {
+        "type": "string",
+        "value": "[listKeys(variables('storageAccountId'),'2015-05-01-preview').key1]"
+      }
+    }
 }

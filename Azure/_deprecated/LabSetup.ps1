@@ -2,7 +2,7 @@
 
 # Sandbox setup
 
-$rgName = "ABSVirtualNetwork"
+$rgName = "alphaSQLCluster"
 $location = "northcentralus"
 
 $vNetName = "absvNet"

@@ -1,22 +1,17 @@
-﻿configuration ModuleTest {
-
-Import-DscResource -ModuleName cSmbShare
-
-    node Name {
+﻿configuration ModuleTest 
+{
+    node AzureDscVm {
         File Web
             {
                 Ensure = "Present"
                 DestinationPath = "C:\Web"
                 Type = "Directory"
             }
-
-            cSmbShare Web
+            
+            WindowsFeature Web
             {
                 Ensure = "Present"
-                Name = "Web"
-                Path = "C:\Web"
-                DependsOn = "[File]Web"
-                ReadAccess = "Everyone"
-            }
+                Name = "Web-Server"
+            }            
     }
 }

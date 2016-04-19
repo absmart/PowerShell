@@ -1,5 +1,7 @@
 ﻿configuration webserver
 {
+    Import-DscResource –ModuleName ’PSDesiredStateConfiguration’ 
+    
     Node green
     {
         File Test
@@ -9,6 +11,7 @@
             Type = "File"
             Contents = "Hello from Azure Automation DSC!"
         }
+        
         File Test2
         {
             Ensure = "Present"
@@ -16,19 +19,11 @@
             Type = "File"
             Contents = "Hello from Azure Automation DSC!"
         }
-        File Test3
-        {
-            Ensure = "Absent"
-            DestinationPath = "C:\testgreen3.txt"
-            Type = "File"
-            Contents = "Updated the ps1 and reuploaded."
-        }
-        File Test4
+
+        WindowsFeature Web-Server
         {
             Ensure = "Present"
-            DestinationPath = "C:\testgreen4.txt"
-            Type = "File"
-            Contents = "Updated the ps1 and reuploaded."
+            Name = "Web-Server"
         }
     }
     Node red
@@ -40,6 +35,7 @@
             Type = "File"
             Contents = "Hello from Azure Automation DSC!"
         }
+
         File Test2
         {
             Ensure = "Present"
@@ -47,19 +43,11 @@
             Type = "File"
             Contents = "Hello from Azure Automation DSC!"
         }
-        File Test3
-        {
-            Ensure = "Absent"
-            DestinationPath = "C:\testred3.txt"
-            Type = "File"
-            Contents = "Updated the ps1 and reuploaded."
-        }
-        File Test4
+
+        WindowsFeature Web-Server
         {
             Ensure = "Present"
-            DestinationPath = "C:\testgreen4.txt"
-            Type = "File"
-            Contents = "Updated the ps1 and reuploaded."
+            Name = "Web-Server"
         }
     }
 }

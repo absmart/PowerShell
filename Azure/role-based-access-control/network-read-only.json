@@ -1,0 +1,16 @@
+﻿{
+  "Name": "Network Read-Only Access",
+  "Id": "f0c5fd49-c2a4-40e5-8a4e-e399975b0f5b",
+  "Description": "Can only view Network related resources.",
+  "Actions": [
+    "Microsoft.Authorization/*/read",
+    "Microsoft.Insights/alertRules/*/read",
+    "Microsoft.Network/*/read",
+    "Microsoft.ResourceHealth/availabilityStatuses/read",
+    "Microsoft.Resources/deployments/*/read",
+    "Microsoft.Resources/subscriptions/resourceGroups/read"
+  ],
+  "NotActions": [
+  ],
+  "AssignableScopes": [ "/" ]
+}

@@ -1,7 +1,7 @@
 {
-  "Name": "Example Role",
+  "Name": "Azure SQL Read Only",
   "Id": "7d4ddd7e-01a4-48ae-bb00-8d042a6feacf",
-  "Description": "This is an example role. The actions defined are usually assigned in all role definitions. Add the relevant Actions/NotActions and scope",
+  "Description": "Grants read-only access to Azure SQL.",
   "Actions": [
     "Microsoft.Authorization/*/read",
     "Microsoft.Insights/alertRules/*/read",
@@ -12,5 +12,5 @@
   ],
   "NotActions": [
   ],
-  "AssignableScopes": [ "/subscriptions/*" ]
+  "AssignableScopes": [ "/" ]
 }

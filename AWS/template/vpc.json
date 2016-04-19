@@ -1,0 +1,52 @@
+
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "",
+    "Metadata": {
+
+    },
+    "Parameters": {
+    
+    },
+    "Mappings": {
+
+    },
+    "Conditions": {
+
+    },
+    "Resources": {
+        
+        "-": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "KeyName": "ABS",
+                "DisableApiTermination": "-",
+                "ImageId": {  },
+                "InstanceType": "-",
+                "Monitoring": "true|false",
+                "SecurityGroupIds" : [-],
+                "Tags": [
+                    {
+                        "Key": "-",
+                        "Value": "-"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash -ex",
+                                "-"
+                            ]
+                        ]
+                    }
+                }
+        }
+                }
+    },
+    "Outputs": {
+
+    }
+}
+    
