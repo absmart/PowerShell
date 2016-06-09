@@ -1081,3 +1081,9 @@ function Create-SecureCredential
 	$Credential = New-Object System.Management.Automation.PSCredential ($Username, $securePassword)
 	return $Credential
 }
+
+function Get-MyIp
+{
+    (Invoke-WebRequest -Uri icanhazip.com).Content
+}
+New-Alias -Name myip -Value Get-MyIp
