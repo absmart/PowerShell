@@ -32,12 +32,12 @@ Catch
     $ErrorMsg = $_.Exception.Message    Write-Verbose $ErrorMsg
 }
 
-if($EnableCredSSP){
+if($EnableCredSSPClient){
 
     $CredSSP = Get-Item WSMan:\localhost\Client\Auth\CredSSP
 
     if($CredSSP.Value -ne $true){
-        Enable-WSManCredSSP -Role Client -DelegateComputer $EnableCredSSP -Force
+        Enable-WSManCredSSP -Role Client -DelegateComputer $EnableCredSSPClient -Force
     }
 }
 
