@@ -7,15 +7,17 @@
     [string] $password,
 
     [Parameter(Mandatory=$false, HelpMessage="Provide a SPN role assignment")]
-    [string] $spnRole = "owner"
+    [string] $spnRole = "owner",
+
+    [Parameter(Mandatory=$false, HelpMessage="Provide a prefix name to the SPN")]
+    [string] $name = "VSO"
 )
 
 #Initialize
 $ErrorActionPreference = "Stop"
 $VerbosePreference = "SilentlyContinue"
-$userName = $env:USERNAME
 $newguid = [guid]::NewGuid()
-$displayName = [String]::Format("VSO.{0}.{1}", $userName, $newguid)
+$displayName = [String]::Format("{0}.{1}", $name, $newguid)
 $homePage = "http://" + $displayName
 $identifierUri = $homePage
 
