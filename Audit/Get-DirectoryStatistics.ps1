@@ -9,7 +9,7 @@ if ( -not ( Test-Path $directory ) ) {
 
 $DirectoryStatistics = @()
 
-dir -Recurse $directory | where { $_.GetType().Name -eq "DirectoryInfo" }  | % {
+Get-ChildItem -Recurse $directory | Where-Object { $_.GetType().Name -eq "DirectoryInfo" }  | % {
 	
 	$LargeFiles = $nul
 	$FullName = $_.FullName
@@ -20,18 +20,18 @@ dir -Recurse $directory | where { $_.GetType().Name -eq "DirectoryInfo" }  | % {
 	$Count = $Files.Count
 	$Measure = $Files | Measure-Object -Property Length -Maximum -Minimum -Sum
 	
-	$Large = $Files | Where { $_.Length -gt 52428800 }
+	$Large = $Files | Where-Object { $_.Length -gt 52428800 }
 	$LargeFileCount = $Large.Count
 	$LargeMeasure = $Large | Measure-Object -Property Length -Maximum -Minimum -Sum -Average
 	
 	$stats = New-Object System.Object 
-	$stats | add-member -type NoteProperty -name Directory -Value $FullName
-	$stats | add-member -type NoteProperty -name FileCount -Value $Count
-	$stats | add-member -type NoteProperty -name MaxFileSize -Value ($Measure.Maximum/1mb)
-	$stats | add-member -type NoteProperty -name TotalSize -Value ($Measure.Sum/1mb)
-	$stats | add-member -type NoteProperty -name LargeFileCount -Value $LargeFileCount
-	$stats | add-member -type NoteProperty -name LargeFileAverageSize -Value ($LargeMeasure.Average/1mb)
-	$stats | add-member -type NoteProperty -name LargeFIleTotalSize -Value ($LargeMeasure.Sum/1mb)
+	$stats | Add-Member -type NoteProperty -Name Directory -Value $FullName
+	$stats | Add-Member -type NoteProperty -Name FileCount -Value $Count
+	$stats | Add-Member -type NoteProperty -Name MaxFileSize -Value ($Measure.Maximum/1mb)
+	$stats | Add-Member -type NoteProperty -Name TotalSize -Value ($Measure.Sum/1mb)
+	$stats | Add-Member -type NoteProperty -Name LargeFileCount -Value $LargeFileCount
+	$stats | Add-Member -type NoteProperty -Name LargeFileAverageSize -Value ($LargeMeasure.Average/1mb)
+	$stats | Add-Member -type NoteProperty -Name LargeFIleTotalSize -Value ($LargeMeasure.Sum/1mb)
 	
 	
 	$DirectoryStatistics += $stats
