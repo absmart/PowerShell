@@ -3,14 +3,12 @@
   "Id": "7d4ddd7e-01a4-48ae-bb00-8d042a6feacf",
   "Description": "This is an example role. The actions defined are usually assigned in all role definitions. Add the relevant Actions/NotActions and scope",
   "Actions": [
-    "Microsoft.Authorization/*/read",
-    "Microsoft.Insights/alertRules/*/read",
-    "Microsoft.ResourceHealth/availabilityStatuses/read",
-    "Microsoft.Resources/deployments/*/read",
-    "Microsoft.Resources/subscriptions/resourceGroups/read",
-    "Microsoft.Support/*"
+    "*"
   ],
   "NotActions": [
   ],
   "AssignableScopes": [ "/subscriptions/*" ]
 }
+
+
+

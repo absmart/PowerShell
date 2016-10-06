@@ -1,0 +1,15 @@
+{
+    "Name": "AlexDev Policy",
+    "Id": "e49f4d59-fc30-4768-83ea-3fe6643f3e2b",
+    "IsCustom": true,
+    "Description": "Grants access to the AlexDevResourceGroup",
+    "Actions": [
+        "*"
+    ],
+    "NotActions": [
+    ],
+    "AssignableScopes": ["/subscriptions/{subscriptionid}/resourceGroups/AlexDevResourceGroup/*"]
+}
+
+
+

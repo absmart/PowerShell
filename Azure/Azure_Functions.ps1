@@ -1,20 +1,5 @@
 ﻿Import-Module (Join-Path $env:POWERSHELL_HOME "\Azure\Azure_Variables.psm1")
 
-function Load-AzureRM{
-    try{Get-AzureRmSubscription}
-    catch{
-        Select-AzureRmProfile -Path C:\Keys\visualStudioKey-Azure.json | Out-Null
-    }
-}
-New-Alias -Name arm -Value Load-AzureRM
-
-Load-AzureRm # Forcibly select personal Azure profile on profile start
-
-function Set-AzureLabContext {
-    Get-AzureRmSubscription | Where-Object {$_.SubscriptionId -eq "b8d7c6ba-ef18-484c-ad5c-da10d1e329fd"} | Set-AzureRmContext
-}
-New-Alias -Name azlab -Value Set-AzureLabContext
-
 function ConnectTo-AzureInstance {
     param(
         $Subscription

@@ -1,0 +1,1 @@
+﻿Get-VM | Select Name, PowerState, Version, Description, Notes, Guest, NumCPU, MemoryMB, MemoryGB, @{name='HardDisks';expression={$_.HardDisks}}, Host, UsedSpaceGB, ProvisionedSpaceGB | Export-Csv -NoTypeInformation -Path C:\Temp\VMExport.csv

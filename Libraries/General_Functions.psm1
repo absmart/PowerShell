@@ -1,7 +1,7 @@
 ﻿function Get-ComputerDetail
 {
 	param(
-		$ComputerName
+		$ComputerName = "localhost"
 	)
 
     foreach($Computer in $ComputerName)
@@ -1087,3 +1087,37 @@ function Get-MyIp
     (Invoke-WebRequest -Uri icanhazip.com).Content
 }
 New-Alias -Name myip -Value Get-MyIp
+
+function Get-UnInheritedFolders
+{
+    param(
+        $Directory = "C:\Example"
+    )
+
+    $directoryChildItems = (Get-ChildItem -Path $Directory -Recurse -Directory)
+    $status = @()
+    
+    foreach($directory in $directoryParse)
+    {
+        #$inheritance = ($directory | Get-Acl).Access | Where-Object {$_.InheritanceFlags -eq $false}
+        $acls = (Get-Acl -Path $Directory.FullName).Access
+        foreach ($acl in $acls)
+        {
+            if($hing)
+            {
+                $result = [ordered]@{
+                    FolderPath = $Folder.FullName;
+                    IsInherited = $acl.IsInherited;
+                    InheritanceFlags = $acl.InheritanceFlags;
+                    PropagationFlags = $acl.PropagationFlags
+                }
+
+            $results += (New-Object -TypeName PSObject -Property $result)
+            
+            }
+        }
+    }
+
+    return $results
+}
+function Find-Location($ip) {([xml](wget "http://freegeoip.net/xml/$ip").Content).Response}

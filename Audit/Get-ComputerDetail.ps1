@@ -13,8 +13,7 @@
 	    $NICs = Get-WmiObject Win32_NetworkAdapterConfiguration -ComputerName $Computer
 	    $CPU = Get-WmiObject Win32_Processor -ComputerName $Computer | Select-Object -First 1 MaxClockSpeed,NumberOfCores
 	    $Disks = Get-WmiObject Win32_LogicalDisk -ComputerName $Computer
-        
-        #$LastBootTime = Get-WmiObject -Class Win32_OperatingSystem -ComputerName $Computer | gm
+
 	    $UpTime = $OS | select @{LABEL='LastBootUpTime';EXPRESSION={$_.ConverttoDateTime($_.lastbootuptime)}}
         $SysUptime = (Get-Date) - [System.Management.ManagementDateTimeconverter]::ToDateTime($OS.LastBootUpTime)
 
