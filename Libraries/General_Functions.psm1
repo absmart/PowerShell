@@ -481,7 +481,7 @@ function Remove-Certificate
     }
 }
 
-function Export-Certificate
+function Export-PfxCertificate2
 {
 	param(
 		[string] $subject,
