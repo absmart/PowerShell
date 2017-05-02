@@ -1,5 +1,11 @@
 ﻿Import-Module (Join-Path $env:POWERSHELL_HOME "\Azure\Azure_Variables.psm1")
 
+function Select-AzureRmVSTSSubscription {
+    Get-AzureRmSubscription -SubscriptionName "Visual Studio Enterprise" | Select-AzureRmSubscription | Out-Null
+    Get-AzureRmContext
+}
+New-Alias -Name vstsselect -Value Select-AzureRmVSTSSubscription
+
 function ConnectTo-AzureInstance {
     param(
         $Subscription
