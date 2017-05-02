@@ -1,16 +1,11 @@
-function Connect-O365 {
-  if(Get-Module -Name MSOnline){
+function Connect-O365EO {
     $UserCredential = Get-Credential
-    $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $UserCredential -Authentication Basic -AllowRedirection
-    Import-PSSession -Session $Session
-  }
-  else{
-      $UserCredential = Get-Credential
-      Connect-MsolService -Credential $UserCredential
-      $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $UserCredential -Authentication Basic -AllowRedirection
-      Import-PSSession -Session $Session
-  }
+    $Session=New-PSSession -ConnectionUri https://ps.outlook.com/Powershell `
+        -ConfigurationName Microsoft.Exchange -Credential $UserCredential `
+        -Authentication Basic -AllowRedirection
+    Import-PSSession $Session
 }
+New-Alias -Name o365connect -Value Connect-O365EO
 
 function Disconnect-O365 {
   $Session = Get-PSSession | Where-Object {$_.ComputerName -eq 'outlook.office365.com'}
@@ -80,4 +75,3 @@ function Set-O365License { # This script will adjust enabled plan options with a
 function Get-O365SkypeLicenses { # Returns all users that have Skype for Business enabled
     Get-MsolUser -All | where {$_.isLicensed -eq $true -and $_.Licenses[0].ServiceStatus[8].ProvisioningStatus -ne "Disabled"}
 }
-
