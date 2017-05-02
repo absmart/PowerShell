@@ -1121,3 +1121,23 @@ function Get-UnInheritedFolders
     return $results
 }
 function Find-Location($ip) {([xml](wget "http://freegeoip.net/xml/$ip").Content).Response}
+
+function Get-RemoteSession
+{
+    param(
+        $serverName,
+        $userName
+    )
+    quser /server:$serverName | ? { $_ -match $username }
+}
+
+function Logoff-RemoteSession
+{
+    param(
+        $serverName,
+        $userName
+    )
+    $session = ((quser /server:$serverName | ? { $_ -match $username }) -split ' +')[2]
+    logoff $session /server:$serverName
+    Write-Verbose "Logged off session # $session on $serverName for user $userName"
+}
