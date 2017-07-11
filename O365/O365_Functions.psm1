@@ -1,11 +1,18 @@
-function Connect-O365EO {
-    $UserCredential = Get-Credential
-    $Session=New-PSSession -ConnectionUri https://ps.outlook.com/Powershell `
-        -ConfigurationName Microsoft.Exchange -Credential $UserCredential `
-        -Authentication Basic -AllowRedirection
-    Import-PSSession $Session
+function Connect-O365 {
+    param(
+        $Credential = (Get-Credential),
+        [switch]$MSOL,
+        [switch]$ExchangeOnline
+    )
+    if($ExchangeOnline) {
+        $session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri "https://outlook.office365.com/powershell-liveid/" -Credential $Credential -Authentication Basic –AllowRedirection
+        Import-PSSession $session -DisableNameChecking
+    }
+    if($msol) {
+        Connect-MsolService -Credential $Credential
+    }
 }
-New-Alias -Name o365connect -Value Connect-O365EO
+New-Alias -Name o365connect -Value Connect-O365
 
 function Disconnect-O365 {
   $Session = Get-PSSession | Where-Object {$_.ComputerName -eq 'outlook.office365.com'}
