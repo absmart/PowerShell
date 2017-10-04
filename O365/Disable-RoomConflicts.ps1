@@ -5,7 +5,8 @@ Import-PSSession $session -DisableNameChecking
 
 
 # Get Rooms and disable AllowConflicts
-$rooms = Get-Mailbox -ResultSize Unlimited | Where {$_.ResourceType -eq 'Room'}
+    Get-CalendarProcessing | Select-Object Identity, AllowConflicts | Where-Object {$_.AllowConflicts -eq $true}
+    $rooms = Get-Mailbox -ResultSize Unlimited | Where-Object {$_.ResourceType -eq 'Room'}
 
 foreach($room in $rooms){
     
@@ -13,4 +14,5 @@ foreach($room in $rooms){
 }
 
 # Verify AllowConflicts is now false
-(Get-Mailbox -ResultSize Unlimited | Where {$_.ResourceType -eq 'Room'}) | Get-CalendarProcessing | Select Identity, AllowConflicts
+(Get-Mailbox -ResultSize Unlimited | Where {$_.ResourceType -eq 'Room'}) | `
+    Get-CalendarProcessing | Select-Object Identity, AllowConflicts | Where-Object {$_.AllowConflicts -eq $true}
