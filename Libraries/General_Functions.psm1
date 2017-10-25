@@ -14,20 +14,20 @@
 	    $CPU = Get-WmiObject Win32_Processor -ComputerName $Computer | select -first 1 MaxClockSpeed,NumberOfCores
 	    $Disks = Get-WmiObject Win32_LogicalDisk -ComputerName $Computer
 
-	    $Audit | add-member -type NoteProperty -name SystemName -Value $ComputerSystem.Name
-	    $Audit | add-member -type NoteProperty -name Domain -Value $ComputerSystem.Domain
-	    $Audit | add-member -type NoteProperty -name Model -Value ($ComputerSystem.Manufacturer + " " + $ComputerSystem.Model.TrimEnd())
-	    $Audit | add-member -type NoteProperty -name Processor -Value ("{0}({1}) x {2} GHz" -f $ComputerSystem.NumberOfProcessors.toString(), $CPU.NumberOfCores.toString(), ($CPU.MaxClockSpeed/1024).toString("#####.#"))
-	    $Audit | add-member -type NoteProperty -name Memory -Value ($ComputerSystem.TotalPhysicalMemory/1gb).tostring("#####.#")
-	    $Audit | add-member -type NoteProperty -name SerialNumber -Value ($BIOS.SerialNumber.TrimEnd())
-	    $Audit | add-member -type NoteProperty -name OperatingSystem -Value ($OS.Caption + " - " + $OS.ServicePackMajorVersion.ToString() + "." + $OS.ServicePackMinorVersion.ToString())
+	    $Audit | Add-Member -type NoteProperty -name SystemName -Value $ComputerSystem.Name
+	    $Audit | Add-Member -type NoteProperty -name Domain -Value $ComputerSystem.Domain
+	    $Audit | Add-Member -type NoteProperty -name Model -Value ($ComputerSystem.Manufacturer + " " + $ComputerSystem.Model.TrimEnd())
+	    $Audit | Add-Member -type NoteProperty -name Processor -Value ("{0}({1}) x {2} GHz" -f $ComputerSystem.NumberOfProcessors.toString(), $CPU.NumberOfCores.toString(), ($CPU.MaxClockSpeed/1024).toString("#####.#"))
+	    $Audit | Add-Member -type NoteProperty -name Memory -Value ($ComputerSystem.TotalPhysicalMemory/1gb).tostring("#####.#")
+	    $Audit | Add-Member -type NoteProperty -name SerialNumber -Value ($BIOS.SerialNumber.TrimEnd())
+	    $Audit | Add-Member -type NoteProperty -name OperatingSystem -Value ($OS.Caption + " - " + $OS.ServicePackMajorVersion.ToString() + "." + $OS.ServicePackMinorVersion.ToString())
 
 	    $LocalDisks = $Disks | where { $_.DriveType -eq 3 } | Select DeviceId, @{Name="FreeSpace";Expression={($_.FreeSpace/1mb).ToString("######.#")}},@{Name="TotalSpace";Expression={($_.Size/1mb).ToString("######.#")}}
-	    $Audit | add-member -type NoteProperty -name Drives -Value $LocalDisks
+	    $Audit | Add-Member -type NoteProperty -name Drives -Value $LocalDisks
 
 	    $IPAddresses = @()
-	    $NICs | where { -not [string]::IsNullorEmpty($_.IPAddress)  -and $_.IPEnabled -eq $true -and $_.IpAddress -ne "0.0.0.0" } | % { $IPAddresses += $_.IPAddress }
-	    $Audit | add-member -type NoteProperty -name IPAddresses -Value $IPAddresses
+	    $NICs | Where-Object { -not [string]::IsNullorEmpty($_.IPAddress)  -and $_.IPEnabled -eq $true -and $_.IpAddress -ne "0.0.0.0" } | ForEach-Object { $IPAddresses += $_.IPAddress }
+	    $Audit | Add-Member -type NoteProperty -name IPAddresses -Value $IPAddresses
 
 	    return $Audit
     }
@@ -1120,7 +1120,7 @@ function Get-UnInheritedFolders
 
     return $results
 }
-function Find-Location($ip) {([xml](wget "http://freegeoip.net/xml/$ip").Content).Response}
+function Find-Location($ip) {([xml](Invoke-WebRequest "http://freegeoip.net/xml/$ip").Content).Response}
 
 function Get-RemoteSession
 {
