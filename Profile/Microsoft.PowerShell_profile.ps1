@@ -10,6 +10,7 @@
 
 Import-Module (Join-Path ${env:ProgramFiles(x86)} "\AWS Tools\PowerShell\AWSPowerShell\AWSPowerShell.psd1")
 Import-Module (Join-Path $ENV:POWERSHELL_HOME "\AWS\AWS_Functions.psm1")
+Import-Module (Join-Path $ENV:POWERSHELL_HOME "\Modules\PSExcel\1.0.2\PSExcel.psm1")
 Set-DefaultAWSRegion -Region us-west-2
 
 function Load-AzureRM{
