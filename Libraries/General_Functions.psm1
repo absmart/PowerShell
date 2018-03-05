@@ -1121,7 +1121,6 @@ function Get-UnInheritedFolders
     return $results
 }
 function Find-Location($ip) {([xml](Invoke-WebRequest "http://freegeoip.net/xml/$ip").Content).Response}
-
 function Get-RemoteSession
 {
     param(
@@ -1130,7 +1129,6 @@ function Get-RemoteSession
     )
     quser /server:$serverName | ? { $_ -match $username }
 }
-
 function Logoff-RemoteSession
 {
     param(
@@ -1140,4 +1138,15 @@ function Logoff-RemoteSession
     $session = ((quser /server:$serverName | ? { $_ -match $username }) -split ' +')[2]
     logoff $session /server:$serverName
     Write-Verbose "Logged off session # $session on $serverName for user $userName"
+}
+
+function New-CredentialFile
+{
+    param(
+        $path = ".\Cred.txt"
+    )
+    $password = Read-Host -AsSecureString -Prompt "Enter the password to be encrypted : "
+    $password | ConvertFrom-SecureString | Set-Content -Path $path
+    $password = $null
+    Write-Output "Credential file has been created : " $path
 }
