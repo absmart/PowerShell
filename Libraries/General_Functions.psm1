@@ -367,6 +367,7 @@ function Get-TopProcesses
 
     return ( $Items | Sort-Object -Property CPU -Descending)
 }
+New-Alias -Name top -Value Get-TopProcesses
 
 function Get-ScheduledTasks
 {
