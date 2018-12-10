@@ -660,13 +660,30 @@ function Add-UserToLocalAdmin
 {
     param(
         [string[]] $ComputerName = $ENV:COMPUTERNAME,
-        [string[]] $User
+        [string[]] $User,
+        [string] $Domain
     )
     foreach($Computer in $ComputerName){
         foreach($U in $User){
-	        $DomainController = ([ADSI]'').name
+	        $DomainController = ([ADSI]$Domain).name
             $localGroup = [ADSI]"WinNT://$Computer/Administrators,user"
             $localGroup.Add("WinNT://$DomainController/$U,user")
+        }
+    }
+}
+
+function Remove-UserFromLocalAdmin
+{
+    param(
+        [string[]] $ComputerName = $ENV:COMPUTERNAME,
+        [string[]] $User,
+        [strin] $Domain
+    )
+    foreach($Computer in $ComputerName){
+        foreach($U in $User){
+	        $DomainController = ([ADSI]$domain).name
+            $localGroup = [ADSI]"WinNT://$Computer/Administrators,user"
+            $localGroup.Remove("WinNT://$DomainController/$U,user")
         }
     }
 }

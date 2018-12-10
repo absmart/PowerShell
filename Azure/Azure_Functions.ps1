@@ -22,13 +22,6 @@ function ConnectTo-AzureInstance {
     }
     Add-AzureAccount -Credential
 }
-
-function ConnectTo-MsolService {
-    $msolCred = Get-Credential
-    Connect-MsolService -Credential $msolCred
-}
-New-Alias -Name aad -Value ConnectTo-MsolService
-
 function Get-AzureImageName {
     param(
         [ValidateSet("Windows","Linux")]$OS,

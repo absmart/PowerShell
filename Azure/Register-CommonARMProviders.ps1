@@ -1,0 +1,6 @@
+Register-AzureRmResourceProvider -ProviderNamespace Microsoft.Advisor
+Register-AzureRmResourceProvider -ProviderNamespace Microsoft.ALertsManagement
+Register-AzureRmResourceProvider -ProviderNamespace Microsoft.OperationalInsights
+Register-AzureRmResourceProvider -ProviderNamespace Microsoft.OperationsManagement
+Register-AzureRmResourceProvider -ProviderNamespace Microsoft.PolicyInsights
+Register-AzureRmResourceProvider -ProviderNamespace Microsoft.RecoveryServices

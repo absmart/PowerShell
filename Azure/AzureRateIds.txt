@@ -1,0 +1,34 @@
+MS-AZR-0026P - Microsoft Azure for 12 months
+MS-AZR-0003P - Pay-As-You-Go
+MS-AZR-0033P - Azure Dynamics
+MS-AZR-0044P - Free Trial
+MS-AZR-0023P - MSDN Dev/Test Pay-As-You-Go
+MS-AZR-0059P - Visual Studio Professional with MSDN (benefit)
+MS-AZR-0060P - Visual Studio Test Professional with MSDN (benefit)
+MS-AZR-0061P - Visual Studio Premium with MSDN (benefit)
+MS-AZR-0062P - MSDN Platforms (benefit)
+MS-AZR-0063P - Visual Studio Ultimate with MSDN (benefit)
+MS-AZR-0025P - Action Pack
+MS-AZR-0064P - Visual Studio Ultimate with MSDN - BizSpark (benefit)
+MS-AZR-0149P - BizSpark Plus
+MS-AZR-0090P - Backup Storage for Windows Server
+MS-AZR-0120P - Azure Pass
+MS-AZR-0121P - Azure Pass
+MS-AZR-0122P - Azure Pass
+MS-AZR-0123P - Azure Pass
+MS-AZR-0124P - Azure Pass
+MS-AZR-0125P - Azure Pass
+MS-AZR-0126P - Azure Pass
+MS-AZR-0127P - Azure Pass
+MS-AZR-0128P - Azure Pass
+MS-AZR-0111p - Azure in Open Licensing
+MS-AZR-0148P - Enterprise MSDN Dev/Test
+MS-AZR-0144P - DreamSpark
+MS-AZR-0037P - 6-Month Plan
+MS-AZR-0038P - 6-Month Plan (Prepaid)
+MS-AZR-0039P - 12-Month Plan
+MS-AZR-0040P - 12-Month Plan (Prepaid)
+MS-AZR-0035P - MPN Action Pack
+MS-AZR-0017P - Restricted offer for customers billed through Enterprise Portal
+MS-AZR-0029P - Visual Studio Enterprise (MPN) subscribers
+MS-AZR-0036P - Azure Pass
