@@ -42,4 +42,4 @@ if($EnableCredSSPClient){
 }
 
 # Install modules
-Copy-Item -Path $env:POWERSHELL_HOME\Profile\Modules\* -Destination $env:USERPROFILE\Documents\windowsPowerShell\Modules -Recurse -Container
+Copy-Item -Path $env:POWERSHELL_HOME\Modules\* -Destination $env:USERPROFILE\Documents\windowsPowerShell\Modules -Recurse -Container
