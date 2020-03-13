@@ -19,5 +19,5 @@ function Fix-HyperV
         Start-Sleep -Seconds 5
     }
 
-    Start-VM -Name "VM01"
+    #Start-VM -Name "VM01"
 }
