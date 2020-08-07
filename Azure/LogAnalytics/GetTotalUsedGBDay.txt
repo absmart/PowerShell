@@ -1,0 +1,9 @@
+let daystoSearch = 1d;
+union withsource = tt *
+| where TimeGenerated > ago(daystoSearch)
+| summarize
+    RecordCount=count(),
+    MbperRecord = round(sum(_BilledSize / 1024 / 1024) / count(), 4),
+    TotalMBytes= round(sum(_BilledSize / 1024 / 1024), 2)
+by SolutionName = tt, _IsBillable
+| sort by SolutionName asc
